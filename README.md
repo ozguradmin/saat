@@ -12,7 +12,7 @@ Mekanizma, kasa, ibreler ve kordon Türkiye'den hazır alınıyor; kadran Türki
 | `tasarim/kadran/kadran.py` | Kadran üreteci: tek geometriden DXF (lazer), Gerber (PCB), SVG/PNG önizleme |
 | `tasarim/kadran/cikti/` | Üretilmiş dosyalar: `ozgur_kadran_<stil>[_tarihli][_ayakli]_{lazer.dxf,gerber.zip}` |
 | `tasarim/kasa/kasa.py` | 12 köşeli kasa, arka kapak ve ara halka (CadQuery) |
-| `tasarim/kasa/cikti/` | `*.step` (CNC teklifi için), `*.stl` (reçine prova baskısı için), `montaj.glb` (önizleme) |
+| `tasarim/kasa/cikti/` | `*.step` (CNC teklifi için), `*.stl` (reçine prova baskısı için), `montaj.glb` + base64 kopyası `montaj_glb.txt` (önizleme sayfası `.glb` sunamadığı için) |
 | `reports/5000 TL altı özel saat yapımı.md` | Kaynaklı araştırma raporu: gümrük, fiyatlar, üretim yolları, teknik ölçüler, senaryolar |
 | `research_notes/` | Raporun dayandığı ham araştırma notları |
 

@@ -832,7 +832,12 @@ boyutla();
 uygula();
 Promise.all([
   maskeAl(S.stil + (S.tarih === 'var' ? '_tarihli' : '')),
-  new GLTFLoader().loadAsync('varlik/kasa.glb').then((gltf) => {
+  // GLB, yayın ortamı .glb sunmadığı için base64 metin olarak geliyor
+  fetch('varlik/kasa_glb.txt').then((r) => { if (!r.ok) throw new Error('kasa modeli: ' + r.status); return r.text(); }).then((b64) => {
+    const ham = atob(b64.trim()), bayt = new Uint8Array(ham.length);
+    for (let i = 0; i < ham.length; i++) bayt[i] = ham.charCodeAt(i);
+    return new GLTFLoader().parseAsync(bayt.buffer, '');
+  }).then((gltf) => {
     gltf.scene.traverse((o) => {
       if (!o.isMesh) return;
       const ad = o.name || o.parent?.name || '';

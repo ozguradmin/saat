@@ -243,6 +243,9 @@ def glb_paketle(adlar, hedef):
         m = smooth_shade(m, angle=math.radians(28))
         sahne.add_geometry(m, node_name=ad, geom_name=ad)
     sahne.export(str(hedef), include_normals=True)
+    # önizleme sayfası .glb sunamadığı için aynı dosyanın base64 metin kopyası
+    import base64
+    hedef.with_name(hedef.stem + "_glb.txt").write_text(base64.b64encode(hedef.read_bytes()).decode("ascii"))
 
 
 if __name__ == "__main__":
