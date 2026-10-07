@@ -1,0 +1,15 @@
+{
+  "stil": "sektor",
+  "cap_mm": 28.5,
+  "yazi_sinirlari": [
+    [
+      -2.79,
+      3.91,
+      2.79,
+      4.89
+    ]
+  ],
+  "altin_alan_mm2": 47.34,
+  "golge_alan_mm2": 159.65,
+  "tarih_penceresi": true
+}

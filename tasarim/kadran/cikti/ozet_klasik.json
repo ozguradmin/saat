@@ -1,0 +1,15 @@
+{
+  "stil": "klasik",
+  "cap_mm": 28.5,
+  "yazi_sinirlari": [
+    [
+      -3.53,
+      5.55,
+      3.53,
+      6.75
+    ]
+  ],
+  "altin_alan_mm2": 25.67,
+  "golge_alan_mm2": 164.01,
+  "tarih_penceresi": false
+}
