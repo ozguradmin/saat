@@ -328,17 +328,19 @@ def stil_roma(P):
 # Bütün konumlar kadran yarıçapı R'ye oranla verilir; donör saat gelince kumpasla
 # ölçülüp gerçek değerler buraya yazılmalı (pinyon delikleri mekanizmaya birebir oturmalı).
 COKLU = {
-    "sol_merkez": (-0.430, 0.0),    # saat 9 alt kadranı (gün)
-    "sag_merkez": (0.430, 0.0),     # saat 3 alt kadranı (tarih 1-31)
-    "alt_r": 0.235,                 # alt kadran yarıçapı
-    "kalp_merkez": (0.0, -0.445),   # saat 6 açık kalp penceresi
-    "kalp_r": 0.190,
-    "buyuk_tarih_merkez": (0.0, 0.330),   # saat 12 altında iki haneli büyük tarih penceresi
-    "buyuk_tarih_g": 0.300,               # pencere genişliği (R oranı)
-    "buyuk_tarih_y": 0.150,
+    # Varsayılanlar: araştırmada 2L27 / H47 / W03 ailesi (ST25 formatı, Ø30,4 mm mekanizma) için
+    # Seagull TY2625 ürün fotoğrafından yapılan ölçüm (±0,3–0,5 mm, resmî değil). Donör gelince ÖLÇ.
+    "sol_merkez": (-0.399, 0.0),    # saat 9 alt kadranı: gün (7,1 mm / R 17,8)
+    "sag_merkez": (0.399, 0.0),     # saat 3 alt kadranı: ay (bu ailede 1-31 tarih ibresi yok)
+    "alt_r": 0.230,                 # alt kadran yarıçapı
+    "kalp_merkez": (0.0, -0.449),   # saat 6 açık kalp: balans ≈ 8,0 mm aşağıda
+    "kalp_r": 0.250,                # platin açıklığı ≈ Ø10 mm; pencere biraz küçük
+    "buyuk_tarih_merkez": (0.0, 0.382),   # büyük tarih rakamları ≈ 6,8 mm yukarıda
+    "buyuk_tarih_g": 0.260,               # rakamlar ≈ 4,1 × 2,3 mm; pencere bir miktar geniş
+    "buyuk_tarih_y": 0.160,
     "pinyon_cap": 0.90,             # alt kadran ibre milleri için delik (mm) — ÖLÇ
     "sol_tip": "gun",               # gun | tarih | 24s | ay
-    "sag_tip": "tarih",
+    "sag_tip": "ay",
 }
 COKLU_KESIM = []    # (çokgen, çerçeve kalınlığı)
 COKLU_DELIK = []    # pinyon delikleri
@@ -389,8 +391,13 @@ def _alt_kadran(P, merkez, rs, tip):
                 p0, p1 = kutup(rs * 0.86, a), kutup(rs * 0.98, a)
                 altin.append(cizgi((cx + p0[0], cy + p0[1]), (cx + p1[0], cy + p1[1]), 0.16))
     elif tip == "ay":
-        for i, ay in enumerate(AYLAR):
-            altin.append(_yay_yazi(ay, 0.55, merkez, rs * 0.76, 30 * i))
+        # 12 ay adı bu çapta sığmıyor: 1-12 ay numarası, tekler yazılı, çiftler nokta
+        for i in range(12):
+            if i % 2 == 0:
+                altin.append(_yay_yazi(str(i + 1), 0.72, merkez, rs * 0.76, 30 * i))
+            else:
+                x, y = kutup(rs * 0.76, 30 * i)
+                altin.append(Point(cx + x, cy + y).buffer(0.14, 24))
     # iç kısım: eş merkezli ince halkalar (salyangoz/azurage görünümü)
     for r in np.arange(0.9, rs * 0.52 - 0.25, 0.30):
         golge.append(affinity.translate(halka(r, 0.15, 180), cx, cy))

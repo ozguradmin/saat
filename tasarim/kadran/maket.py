@@ -73,7 +73,7 @@ def maket(kadran_yol, cap, cikti, stil="roma", ibre="mavi", saat=(10, 9, 36)):
     sa, dk, sn = saat
     if stil == "coklu":
         rs = COKLU["alt_r"] * R
-        for m, deg in ((COKLU["sol_merkez"], 360 / 7 * 3), (COKLU["sag_merkez"], 360 / 31 * 7)):
+        for m, deg in ((COKLU["sol_merkez"], 360 / 7 * 3), (COKLU["sag_merkez"], 30 * 9)):
             cubuk(rs * 0.82, deg, (m[0] * R, m[1] * R), w=0.14)
     yaprak(0.56 * R, 0.085 * R, (sa % 12 + dk / 60) * 30)
     yaprak(0.86 * R, 0.065 * R, dk * 6)
