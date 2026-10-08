@@ -1,0 +1,15 @@
+{
+  "stil": "coklu",
+  "cap_mm": 35.6,
+  "yazi_sinirlari": [
+    [
+      -4.69,
+      9.25,
+      4.69,
+      10.86
+    ]
+  ],
+  "altin_alan_mm2": 106.75,
+  "golge_alan_mm2": 250.46,
+  "tarih_penceresi": false
+}

@@ -80,6 +80,8 @@ STILLER = {
     "sektor": {"logo": "OZGUR", "font": "Jost-Regular.ttf", "boy": 0.95, "aralik": 0.45, "olcu": "H", "logo_y": 4.40},
     "roma": {"logo": "OZGUR", "font": "Cinzel-Medium.ttf", "boy": 1.40, "aralik": 0.32, "olcu": "H", "logo_y": 5.35,
              "kalin": 0.045, "isinsal": False, "plaket": 0.50},
+    "coklu": {"logo": "OZGUR", "font": "Cinzel-Medium.ttf", "boy": 1.45, "aralik": 0.32, "olcu": "H", "logo_y": 9.00,
+              "kalin": 0.045, "isinsal": False, "plaket": 0.50},
 }
 
 RENKLER = {
@@ -319,7 +321,142 @@ def stil_roma(P):
     return altin, golge
 
 
+
+# ----------------------------------------------------------------------------
+# "coklu" stil: fotoğraftaki çok fonksiyonlu saatin düzeni (donör saat kadranı)
+# ----------------------------------------------------------------------------
+# Bütün konumlar kadran yarıçapı R'ye oranla verilir; donör saat gelince kumpasla
+# ölçülüp gerçek değerler buraya yazılmalı (pinyon delikleri mekanizmaya birebir oturmalı).
+COKLU = {
+    "sol_merkez": (-0.430, 0.0),    # saat 9 alt kadranı (gün)
+    "sag_merkez": (0.430, 0.0),     # saat 3 alt kadranı (tarih 1-31)
+    "alt_r": 0.235,                 # alt kadran yarıçapı
+    "kalp_merkez": (0.0, -0.445),   # saat 6 açık kalp penceresi
+    "kalp_r": 0.190,
+    "buyuk_tarih_merkez": (0.0, 0.330),   # saat 12 altında iki haneli büyük tarih penceresi
+    "buyuk_tarih_g": 0.300,               # pencere genişliği (R oranı)
+    "buyuk_tarih_y": 0.150,
+    "pinyon_cap": 0.90,             # alt kadran ibre milleri için delik (mm) — ÖLÇ
+    "sol_tip": "gun",               # gun | tarih | 24s | ay
+    "sag_tip": "tarih",
+}
+COKLU_KESIM = []    # (çokgen, çerçeve kalınlığı)
+COKLU_DELIK = []    # pinyon delikleri
+GUNLER = ["PAZ", "PZT", "SAL", "ÇAR", "PER", "CUM", "CMT"]
+AYLAR = ["OCA", "ŞUB", "MAR", "NİS", "MAY", "HAZ", "TEM", "AĞU", "EYL", "EKİ", "KAS", "ARA"]
+
+
+def _yay_yazi(metin, boy, merkez, r, aci, font="Inter-Bold.otf", kalin=0.03):
+    """Alt kadranın çevresine, tabanı merkeze bakacak biçimde küçük yazı."""
+    g = ortala(yazi(metin, boy, font, aralik=0.08, kalin=kalin), 0, 0)
+    a = aci % 360
+    if 90 < a < 270:
+        a += 180
+    g = affinity.rotate(g, -a, origin=(0, 0))
+    x, y = kutup(r, aci)
+    return affinity.translate(g, merkez[0] + x, merkez[1] + y)
+
+
+def _alt_kadran(P, merkez, rs, tip):
+    altin, golge = [], []
+    cx, cy = merkez
+    altin.append(affinity.translate(halka(rs, 0.18, 360), cx, cy))
+    altin.append(affinity.translate(halka(rs * 0.52, 0.15, 360), cx, cy))
+    if tip == "gun":
+        for i, g in enumerate(GUNLER):
+            altin.append(_yay_yazi(g, 0.62, merkez, rs * 0.76, 360 / 7 * i))
+            altin.append(cizgi((cx + kutup(rs * 0.94, 360 / 7 * i)[0], cy + kutup(rs * 0.94, 360 / 7 * i)[1]),
+                               (cx + kutup(rs * 0.99, 360 / 7 * i)[0], cy + kutup(rs * 0.99, 360 / 7 * i)[1]), 0.16))
+    elif tip == "tarih":
+        # 31 ile 1 yan yana yazılırsa "311" gibi okunur (sahte saatteki "39" karışıklığı):
+        # yalnız 5, 10, ..., 30 yazılır, 1'de üçgen, araları nokta
+        for n in range(1, 32):
+            a = 360 / 31 * (n - 1)
+            if n in (5, 10, 15, 20, 25, 30):
+                altin.append(_yay_yazi(str(n), 0.72, merkez, rs * 0.76, a))
+            elif n == 1:   # ayın 1'i: rakam yerine küçük üçgen (30 ile karışmasın)
+                uc = Polygon([(0, rs * 0.68), (-0.30, rs * 0.86), (0.30, rs * 0.86)])
+                altin.append(affinity.translate(uc, cx, cy))
+            else:
+                x, y = kutup(rs * 0.76, a)
+                altin.append(Point(cx + x, cy + y).buffer(0.13, 24))
+    elif tip == "24s":
+        for h in range(24):
+            a = 15 * h
+            if h % 6 == 0:
+                altin.append(_yay_yazi(str(24 if h == 0 else h), 0.70, merkez, rs * 0.74, a))
+            else:
+                p0, p1 = kutup(rs * 0.86, a), kutup(rs * 0.98, a)
+                altin.append(cizgi((cx + p0[0], cy + p0[1]), (cx + p1[0], cy + p1[1]), 0.16))
+    elif tip == "ay":
+        for i, ay in enumerate(AYLAR):
+            altin.append(_yay_yazi(ay, 0.55, merkez, rs * 0.76, 30 * i))
+    # iç kısım: eş merkezli ince halkalar (salyangoz/azurage görünümü)
+    for r in np.arange(0.9, rs * 0.52 - 0.25, 0.30):
+        golge.append(affinity.translate(halka(r, 0.15, 180), cx, cy))
+    return altin, golge
+
+
+def stil_coklu(P):
+    R = P["cap"] / 2.0
+    C = COKLU
+    altin, golge = [], []
+    COKLU_KESIM.clear()
+    COKLU_DELIK.clear()
+    # demiryolu dakika halkası
+    r_dis, r_ic = R - 0.95, R - 1.55
+    altin += [halka(r_dis, 0.16), halka(r_ic, 0.16)]
+    for m in range(60):
+        altin.append(cizgi(kutup(r_ic, 6 * m), kutup(r_dis, 6 * m), 0.30 if m % 5 == 0 else 0.16))
+    # Roma rakamları (saat 4 ve 8'de geleneksel IIII / VIII), diğer boş saatlerde yaprak işaret
+    rakam_boy = 0.150 * R
+    for h in range(12):
+        if h in (3, 6, 9):
+            continue
+        if h in (0, 4, 8):
+            metin = {0: "XII", 4: "IIII", 8: "VIII"}[h]
+            g = ortala(yazi(metin, rakam_boy, "Cinzel-Medium.ttf", aralik=0.10, kalin=0.04), 0, 0)
+            a = 30 * h
+            if 90 < a < 270:
+                a += 180
+            g = affinity.rotate(g, -a, origin=(0, 0))
+            altin.append(affinity.translate(g, *kutup(r_ic - 0.35 - rakam_boy * 0.62, 30 * h)))
+        else:
+            altin.append(yaprak_isaret(r_ic - 0.35 - 0.19 * R, r_ic - 0.35, 0.055 * R, 30 * h))
+    # alt kadranlar
+    for merkez, tip in ((C["sol_merkez"], C["sol_tip"]), (C["sag_merkez"], C["sag_tip"])):
+        m = (merkez[0] * R, merkez[1] * R)
+        a, g = _alt_kadran(P, m, C["alt_r"] * R, tip)
+        altin += a
+        golge += g
+        COKLU_DELIK.append(Point(*m).buffer(C["pinyon_cap"] / 2, 48))
+    # açık kalp (saat 6)
+    km = (C["kalp_merkez"][0] * R, C["kalp_merkez"][1] * R)
+    COKLU_KESIM.append((Point(*km).buffer(C["kalp_r"] * R, 192), 0.30))
+    # büyük tarih penceresi (iki hane, ortada ince ayraç yok: diskler kendi çerçeveli)
+    bm = (C["buyuk_tarih_merkez"][0] * R, C["buyuk_tarih_merkez"][1] * R)
+    gw, gh = C["buyuk_tarih_g"] * R, C["buyuk_tarih_y"] * R
+    pen = box(bm[0] - gw / 2, bm[1] - gh / 2, bm[0] + gw / 2, bm[1] + gh / 2)
+    COKLU_KESIM.append((pen.buffer(-0.45, join_style=1).buffer(0.45, join_style=1), 0.30))
+    # zemin dokusu: aynı fazlı dalga (roma ile aynı ölçüler), alt kadran ve pencerelerden kırpılır
+    DOKU_CIZGILERI.clear()
+    th = np.linspace(0, 2 * np.pi, 2880, endpoint=False)
+    for r0 in np.arange(1.45, r_ic - 0.55 + 1e-6, 0.32):
+        sol = np.clip((r_ic - 0.55 - r0) / 1.2, 0, 1) * np.clip((r0 - 3.0) / 2.0, 0, 1)
+        r = r0 + 0.009 * r0 * sol * np.sin(40 * th)
+        c = Polygon(list(zip(r * np.sin(th), r * np.cos(th)))).exterior
+        DOKU_CIZGILERI.append(c)
+        golge.append(c.buffer(0.08))
+    yasak = [Point(C["sol_merkez"][0] * R, 0).buffer(C["alt_r"] * R + 0.45),
+             Point(C["sag_merkez"][0] * R, 0).buffer(C["alt_r"] * R + 0.45)]
+    zemin = unary_union([g for g in golge]).difference(unary_union(yasak))
+    alt = unary_union([g for g in golge]).intersection(unary_union([y.buffer(-0.45) for y in yasak]))
+    golge = [zemin.union(alt)]
+    return altin, golge
+
+
 STIL_FONK = {"klasik": stil_klasik, "rakamli": stil_rakamli, "sektor": stil_sektor, "roma": stil_roma}
+STIL_FONK["coklu"] = stil_coklu
 
 
 # ----------------------------------------------------------------------------
@@ -332,7 +469,7 @@ def geometri(P):
     altin, golge = STIL_FONK[P["stil"]](P)
 
     logo = yazi(P["logo"] or S["logo"], S["boy"], S["font"], aralik=S["aralik"], olcu=S["olcu"], kalin=S.get("kalin", 0.0))
-    logo = ortala(logo, 0, S["logo_y"])
+    logo = ortala(logo, 0, S["logo_y"] if P["stil"] != "coklu" else 0.565 * R)
     yazilar = [logo]
     # diğer altın öğeler (ör. sektör stilindeki artı çizgisi) logoya 0.35 mm'den fazla yaklaşmasın
     temiz = unary_union([y.buffer(0.35) for y in yazilar])
@@ -377,6 +514,15 @@ def geometri(P):
         cerceve = Point(*c).buffer(Rk + 0.60, 256).difference(Point(*c).buffer(Rk + 0.30, 256))
         altin = altin.difference(Point(*c).buffer(Rk + 0.80, 256)).union(cerceve)
         golge = golge.difference(Point(*c).buffer(Rk + 0.80, 256))
+    if P["stil"] == "coklu":
+        for pen, kal in COKLU_KESIM:
+            kesim.append(pen)
+            cerceve = pen.buffer(0.30 + kal, join_style=1).difference(pen.buffer(0.30, join_style=1))
+            altin = altin.difference(pen.buffer(0.50 + kal)).union(cerceve)
+            golge = golge.difference(pen.buffer(0.60 + kal))
+        delikler += list(COKLU_DELIK)
+        for d in COKLU_DELIK:
+            golge = golge.difference(d.buffer(0.4))
     kesim_hepsi = unary_union(delikler + kesim)
 
     # bakır serbest bölge: kenar payı, merkez delik ve diğer deliklerin çevresi
@@ -386,7 +532,7 @@ def geometri(P):
         bakir_sinir = bakir_sinir.difference(k.buffer(0.25))
     altin = altin.intersection(bakir_sinir)
     golge = golge.difference(altin.buffer(0.18)).intersection(bakir_sinir)
-    if P["stil"] == "roma" and not golge.is_empty:
+    if P["stil"] in ("roma", "coklu") and not golge.is_empty:
         # 0.15 mm'den ince kıymıkları ve 0.10 mm²'den küçük kırıntıları at
         golge = golge.buffer(-0.075, join_style=1).buffer(0.075, join_style=1)
         golge = unary_union([g for g in _poligonlar(golge) if g.area >= 0.10])
@@ -404,7 +550,7 @@ def geometri(P):
         "bakir": bakir,
         "maske_acik": maske_acik,
         "R": R,
-        "doku_cizgileri": list(DOKU_CIZGILERI) if P["stil"] == "roma" else [],
+        "doku_cizgileri": list(DOKU_CIZGILERI) if P["stil"] in ("roma", "coklu") else [],
         "yazi_sinirlari": [[round(v, 2) for v in y.bounds] for y in yazilar],
     }
 
