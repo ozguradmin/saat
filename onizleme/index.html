@@ -110,6 +110,8 @@ ol.adimlar li p { color: var(--soluk); font-size: .95rem; }
 
 /* --- kadran / kasa --- */
 .stiller { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+.stiller.dort { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+@media (max-width: 1000px) { .stiller.dort { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .stiller figure { margin: 0; display: grid; gap: 10px; justify-items: center; text-align: center; }
 .stiller img { width: 100%; max-width: 300px; aspect-ratio: 1; border-radius: 50%; box-shadow: 0 0 0 8px var(--yuzey-2), 0 0 0 9px var(--cizgi); }
 .stiller figcaption { font-size: .9rem; color: var(--soluk); }
@@ -131,7 +133,7 @@ ul.duz { margin: 0; padding-left: 18px; display: grid; gap: 8px; }
   .panel { border-left: 0; border-top: 1px solid var(--cizgi); }
   #sahne { min-height: 380px; aspect-ratio: 1 / 1; }
   .karar, .iki { grid-template-columns: minmax(0, 1fr); }
-  .stiller { grid-template-columns: minmax(0, 1fr); }
+  .stiller, .stiller.dort { grid-template-columns: minmax(0, 1fr); }
 }
 </style>
 
@@ -145,7 +147,7 @@ ul.duz { margin: 0; padding-left: 18px; display: grid; gap: 8px; }
 
 <section class="sahne-kap" aria-label="3D saat önizlemesi">
   <div id="sahne">
-    <div class="yedek" id="yedek"><img src="varlik/kadran_gece_klasik.webp" alt="Klasik kadran: siyah zemin, ince altın çubuk saat işaretleri, üstte OZGUR yazısı"></div>
+    <div class="yedek" id="yedek"><img src="varlik/kadran_beyaz_roma.webp" alt="Roma rakamlı kadran: beyaz zemin, altın Roma rakamları ve yaprak işaretler, merkezde guilloché, saat 9'da açık kalp penceresi, üstte OZGUR yazısı"></div>
     <div class="rozet" id="kasa-rozet">Kasa: hazır klasik · bütçe içi</div>
     <div class="durum" id="durum">3D model yükleniyor…</div>
   </div>
@@ -153,7 +155,8 @@ ul.duz { margin: 0; padding-left: 18px; display: grid; gap: 8px; }
     <fieldset>
       <legend>Kadran stili</legend>
       <div class="secenekler" data-grup="stil">
-        <button type="button" id="stil-klasik" data-deger="klasik" aria-pressed="true">Klasik</button>
+        <button type="button" id="stil-roma" data-deger="roma" aria-pressed="true">Roma</button>
+        <button type="button" id="stil-klasik" data-deger="klasik" aria-pressed="false">Klasik</button>
         <button type="button" id="stil-rakamli" data-deger="rakamli" aria-pressed="false">Rakamlı</button>
         <button type="button" id="stil-sektor" data-deger="sektor" aria-pressed="false">Sektör</button>
       </div>
@@ -161,24 +164,27 @@ ul.duz { margin: 0; padding-left: 18px; display: grid; gap: 8px; }
     <fieldset>
       <legend>Kadran rengi</legend>
       <div class="secenekler" data-grup="renk">
-        <button type="button" id="renk-gece" data-deger="gece" aria-pressed="true"><span class="nokta" style="background:#0b0c0e"></span>Siyah</button>
+        <button type="button" id="renk-beyaz" data-deger="beyaz" aria-pressed="true"><span class="nokta" style="background:#f1efe8"></span>Beyaz</button>
+        <button type="button" id="renk-gumus" data-deger="gumus" aria-pressed="false"><span class="nokta" style="background:#c9ccd0"></span>Gümüş</button>
+        <button type="button" id="renk-gece" data-deger="gece" aria-pressed="false"><span class="nokta" style="background:#0b0c0e"></span>Siyah</button>
         <button type="button" id="renk-iznik" data-deger="iznik" aria-pressed="false"><span class="nokta" style="background:#0d2c6e"></span>Mavi</button>
         <button type="button" id="renk-zumrut" data-deger="zumrut" aria-pressed="false"><span class="nokta" style="background:#0a3d2b"></span>Yeşil</button>
       </div>
-      <p class="not">Lazerle yalnız siyah–altın yapılır; mavi ve yeşil PCB kadranla olur. Işınsal doku da yalnız PCB'de çıkar.</p>
+      <p class="not" id="renk-not"></p>
     </fieldset>
     <fieldset>
       <legend>İbreler</legend>
       <div class="secenekler" data-grup="ibre">
         <button type="button" id="ibre-altin" data-deger="altin" aria-pressed="true"><span class="nokta" style="background:#e3bb6d"></span>Altın</button>
         <button type="button" id="ibre-gumus" data-deger="gumus" aria-pressed="false"><span class="nokta" style="background:#d9dde2"></span>Gümüş</button>
+        <button type="button" id="ibre-mavi" data-deger="mavi" aria-pressed="false"><span class="nokta" style="background:#2b3f97"></span>Mavi çelik</button>
       </div>
       <p class="not">Türkiye'de kesin bulunan set gümüş; altın NH35 ibresi henüz bulunamadı.</p>
     </fieldset>
     <fieldset>
       <legend>Mekanizma</legend>
       <div class="secenekler" data-grup="tarih">
-        <button type="button" id="tarih-yok" data-deger="yok" aria-pressed="true">NH38A · tarihsiz</button>
+        <button type="button" id="tarih-yok" data-deger="yok" aria-pressed="true">NH38A · açık kalp</button>
         <button type="button" id="tarih-var" data-deger="var" aria-pressed="false">NH35A · tarihli</button>
       </div>
     </fieldset>
@@ -190,9 +196,18 @@ ul.duz { margin: 0; padding-left: 18px; display: grid; gap: 8px; }
       </div>
     </fieldset>
     <fieldset>
+      <legend>Kasa rengi</legend>
+      <div class="secenekler" data-grup="metal">
+        <button type="button" id="metal-celik" data-deger="celik" aria-pressed="true"><span class="nokta" style="background:#d6d9dd"></span>Çelik</button>
+        <button type="button" id="metal-rose" data-deger="rose" aria-pressed="false"><span class="nokta" style="background:#e4ad94"></span>Rose</button>
+        <button type="button" id="metal-altin" data-deger="altin" aria-pressed="false"><span class="nokta" style="background:#e3c17a"></span>Altın</button>
+      </div>
+    </fieldset>
+    <fieldset>
       <legend>Kordon</legend>
       <div class="secenekler" data-grup="kordon">
-        <button type="button" id="kordon-taba" data-deger="taba" aria-pressed="true">Taba deri</button>
+        <button type="button" id="kordon-kroko" data-deger="kroko" aria-pressed="true">Kahve kroko</button>
+        <button type="button" id="kordon-taba" data-deger="taba" aria-pressed="false">Taba deri</button>
         <button type="button" id="kordon-siyah" data-deger="siyah" aria-pressed="false">Siyah deri</button>
         <button type="button" id="kordon-yok" data-deger="yok" aria-pressed="false">Yok</button>
       </div>
@@ -291,10 +306,11 @@ ul.duz { margin: 0; padding-left: 18px; display: grid; gap: 8px; }
 <section class="bolum" aria-labelledby="kadran-b">
   <div class="bolum-bas">
     <div class="etiket-ust">Kadran</div>
-    <h2 id="kadran-b">Üç stil</h2>
-    <p>Üçü de sade ve okunaklı, yazı olarak yalnız logo var. Ölçüler Seiko'nun resmî NH35/NH38 föyünden: Ø28,50 mm, merkez deliği Ø2,10 mm, en ince çizgi 0,15 mm.</p>
+    <h2 id="kadran-b">Dört stil</h2>
+    <p>Hepsinde yazı olarak yalnız logo var. Ölçüler Seiko'nun resmî NH35/NH38 föyünden: Ø28,50 mm, merkez deliği Ø2,10 mm, en ince çizgi 0,15 mm.</p>
   </div>
-  <div class="stiller">
+  <div class="stiller dort">
+    <figure><img src="varlik/kadran_beyaz_roma.webp" alt="Roma kadran: beyaz zemin, altın Roma rakamları, yaprak işaretler, merkezde guilloché, saat 9'da açık kalp penceresi" loading="lazy"><figcaption><b>Roma</b>XII, III, VI rakamları, guilloché merkez, gerçek balansı gösteren açık kalp. Yaprak ibrelerle.</figcaption></figure>
     <figure><img src="varlik/kadran_gece_klasik.webp" alt="Klasik kadran: ince altın çubuklar, 12'de çift çubuk, OZGUR yazısı" loading="lazy"><figcaption><b>Klasik</b>İnce çubuk işaretler, 12'de çift çubuk. Dauphine ibrelerle.</figcaption></figure>
     <figure><img src="varlik/kadran_gece_rakamli.webp" alt="Rakamlı kadran: 12, 3, 6, 9 rakamları ve çubuklar, küçük harfle ozgur" loading="lazy"><figcaption><b>Rakamlı</b>12, 3, 6, 9 rakamlı, küçük harfli logo. Kılıç ibrelerle.</figcaption></figure>
     <figure><img src="varlik/kadran_gece_sektor.webp" alt="Sektör kadran: eş merkezli halkalar, 1'den 12'ye rakamlar, artı çizgisi" loading="lazy"><figcaption><b>Sektör</b>Halkalı, 1–12 rakamlı, eski usul. İnce çubuk ibrelerle.</figcaption></figure>
@@ -443,12 +459,12 @@ const durumEl = document.getElementById('durum');
 const azHareket = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 // ---------- durum ----------
-const S = { stil: 'klasik', renk: 'gece', ibre: 'altin', tarih: 'yok', kasa: 'klasik', kordon: 'taba', gorunum: 'on' };
+const S = { stil: 'roma', renk: 'beyaz', ibre: 'mavi', tarih: 'yok', kasa: 'klasik', metal: 'celik', kordon: 'kroko', gorunum: 'on' };
 try {
   const kayit = JSON.parse(localStorage.getItem('ozgur-secim') || '{}');
-  for (const k of ['stil', 'renk', 'ibre', 'tarih', 'kasa', 'kordon']) if (kayit[k]) S[k] = kayit[k];
+  if (kayit.surum === 2) for (const k of ['stil', 'renk', 'ibre', 'tarih', 'kasa', 'metal', 'kordon']) if (kayit[k]) S[k] = kayit[k];
 } catch (e) {}
-const kaydet = () => { try { const { gorunum, ...geri } = S; localStorage.setItem('ozgur-secim', JSON.stringify(geri)); } catch (e) {} };
+const kaydet = () => { try { const { gorunum, ...geri } = S; localStorage.setItem('ozgur-secim', JSON.stringify({ ...geri, surum: 2 })); } catch (e) {} };
 
 // ---------- render ----------
 let renderer;
@@ -513,7 +529,8 @@ const M = {
   cam: new THREE.MeshPhysicalMaterial({ color: 0xf2f6ff, metalness: 0, roughness: 0, transparent: true, opacity: 0.14, depthWrite: false, specularIntensity: 0.6, envMapIntensity: 0.8 }),
   kenar: new THREE.MeshStandardMaterial({ color: 0x15161a, roughness: 0.6 }),
 };
-const IBRE_RENK = { altin: 0xe9c47e, gumus: 0xe2e5e9 };
+const IBRE_RENK = { altin: 0xe9c47e, gumus: 0xe2e5e9, mavi: 0x1b2a78 };
+const METAL_RENK = { celik: 0xd9dce0, rose: 0xe8b49c, altin: 0xe8c784 };
 
 // ---------- yardımcılar ----------
 const zEksen = (g) => g.rotateX(Math.PI / 2);
@@ -545,11 +562,19 @@ const kadranKenar = new THREE.Mesh(zEksen(new THREE.CylinderGeometry(14.25, 14.2
 kadranKenar.position.z = -0.2;
 P.kadran.add(kadranKenar);
 
+// zM/zP: zeminin metalikliği/pürüzlülüğü; iM/iP: işaretlerin
+const ALTIN = [232, 192, 112];
 const RENK = {
-  gece:   { zemin: [9, 10, 12],   kabartma: [22, 24, 28],  altin: [232, 192, 112] },
-  iznik:  { zemin: [11, 40, 104], kabartma: [22, 58, 128], altin: [232, 192, 112] },
-  zumrut: { zemin: [8, 54, 40],   kabartma: [16, 74, 55],  altin: [232, 192, 112] },
+  beyaz:  { zemin: [243, 241, 234], kabartma: [226, 212, 182], altin: [214, 168, 88], zM: 0.0, zP: 0.62, iM: 1, iP: 0.2,
+            not: 'Beyaz–altın: PCB kadran (beyaz maske + ENIG altın). Altın çizgilerin altındaki bakır, beyaz maskede krem bir guilloché dokusu verir.' },
+  gumus:  { zemin: [206, 208, 212], kabartma: [178, 181, 186], altin: [22, 24, 30], zM: 0.9, zP: 0.34, iM: 0, iP: 0.7,
+            not: 'Gümüş–siyah: gümüş üstü siyah lazer levhası (stok durumu araştırılıyor). Guilloché isteğe bağlı ince koyu çizgi olarak işlenir.' },
+  gece:   { zemin: [9, 10, 12],   kabartma: [22, 24, 28],  altin: ALTIN, zM: 0.0, zP: 0.72, iM: 1, iP: 0.16,
+            not: 'Siyah–altın: lazerle (Halsa Edico levhası) ya da PCB ile yapılır. Doku yalnız PCB\'de çıkar.' },
+  iznik:  { zemin: [11, 40, 104], kabartma: [22, 58, 128], altin: ALTIN, zM: 0.0, zP: 0.72, iM: 1, iP: 0.16, not: 'Mavi–altın: yalnız PCB kadranla.' },
+  zumrut: { zemin: [8, 54, 40],   kabartma: [16, 74, 55],  altin: ALTIN, zM: 0.0, zP: 0.72, iM: 1, iP: 0.16, not: 'Yeşil–altın: yalnız PCB kadranla.' },
 };
+const maskeAdi = () => S.stil + (S.tarih === 'var' ? '_tarihli' : (S.stil === 'roma' ? '_kalpli' : ''));
 const maskeler = {};
 function maskeAl(ad) {
   if (!maskeler[ad]) maskeler[ad] = new Promise((ok, hata) => {
@@ -562,25 +587,30 @@ function maskeAl(ad) {
   });
   return maskeler[ad];
 }
-let kadranTuval, ormTuval, kabartmaTuval, dokuSira = 0;
+let kadranTuval, ormTuval, kabartmaTuval, alfaTuval, dokuSira = 0;
 async function kadranDokusu() {
   const sira = ++dokuSira;
-  const v = await maskeAl(S.stil + (S.tarih === 'var' ? '_tarihli' : ''));
+  const v = await maskeAl(maskeAdi());
   if (sira !== dokuSira) return;
   const w = v.width, h = v.height, n = w * h, d = v.data;
-  if (!kadranTuval) { kadranTuval = tuval(w, h); ormTuval = tuval(w, h); kabartmaTuval = tuval(w, h); }
+  if (!kadranTuval) { kadranTuval = tuval(w, h); ormTuval = tuval(w, h); kabartmaTuval = tuval(w, h); alfaTuval = tuval(w, h); }
   const R = RENK[S.renk];
-  const rk = kadranTuval.getContext('2d'), ok = ormTuval.getContext('2d'), kk = kabartmaTuval.getContext('2d');
-  const ri = rk.createImageData(w, h), oi = ok.createImageData(w, h), ki = kk.createImageData(w, h);
-  const r = ri.data, o = oi.data, k = ki.data;
+  const rk = kadranTuval.getContext('2d'), ok = ormTuval.getContext('2d'), kk = kabartmaTuval.getContext('2d'), ak = alfaTuval.getContext('2d');
+  const ri = rk.createImageData(w, h), oi = ok.createImageData(w, h), ki = kk.createImageData(w, h), ai = ak.createImageData(w, h);
+  const r = ri.data, o = oi.data, k = ki.data, al = ai.data;
   for (let i = 0; i < n; i++) {
     const p = i * 4, a = d[p] / 255, g = d[p + 1] / 255;
     for (let c = 0; c < 3; c++) r[p + c] = (R.zemin[c] * (1 - g) + R.kabartma[c] * g) * (1 - a) + R.altin[c] * a;
     r[p + 3] = 255;
-    o[p] = 255; o[p + 1] = 255 * (0.72 - 0.56 * a - 0.2 * g); o[p + 2] = 255 * (0.02 + 0.98 * a); o[p + 3] = 255;
+    o[p] = 255;
+    o[p + 1] = 255 * Math.max(0.05, R.zP * (1 - a) + R.iP * a - 0.12 * g);
+    o[p + 2] = 255 * (R.zM * (1 - a) + R.iM * a);
+    o[p + 3] = 255;
     k[p] = k[p + 1] = k[p + 2] = 255 * (0.2 * g + 0.8 * a); k[p + 3] = 255;
+    al[p] = al[p + 1] = al[p + 2] = d[p + 2]; al[p + 3] = 255;     // B kanalı: kart (pencereler delik)
   }
-  rk.putImageData(ri, 0, 0); ok.putImageData(oi, 0, 0); kk.putImageData(ki, 0, 0);
+  rk.putImageData(ri, 0, 0); ok.putImageData(oi, 0, 0); kk.putImageData(ki, 0, 0); ak.putImageData(ai, 0, 0);
+  document.getElementById('renk-not').textContent = R.not;
   if (!kadranMat.map) {
     const an = renderer.capabilities.getMaxAnisotropy();
     kadranMat.map = new THREE.CanvasTexture(kadranTuval); kadranMat.map.colorSpace = THREE.SRGBColorSpace;
@@ -588,11 +618,15 @@ async function kadranDokusu() {
     kadranMat.metalnessMap = kadranMat.roughnessMap;
     kadranMat.bumpMap = new THREE.CanvasTexture(kabartmaTuval);
     kadranMat.bumpScale = 0.5;
+    kadranMat.alphaMap = new THREE.CanvasTexture(alfaTuval);
+    kadranMat.alphaTest = 0.5;
     for (const t of [kadranMat.map, kadranMat.roughnessMap, kadranMat.bumpMap]) t.anisotropy = an;
     kadranMat.needsUpdate = true;
   } else {
-    kadranMat.map.needsUpdate = kadranMat.roughnessMap.needsUpdate = kadranMat.bumpMap.needsUpdate = true;
+    kadranMat.map.needsUpdate = kadranMat.roughnessMap.needsUpdate = kadranMat.bumpMap.needsUpdate = kadranMat.alphaMap.needsUpdate = true;
   }
+  balansOn.visible = S.stil === 'roma' && S.tarih !== 'var';
+  tarihDiski.visible = S.tarih === 'var';
 }
 
 // ibreler: dauphine (ortası sırtlı), kılıç ve ince çubuk
@@ -619,10 +653,23 @@ function duzIbre(noktalar, kal = 0.16) {
 }
 const kilic = (L, w, k) => duzIbre([[-0.2 * w, -k], [-0.5 * w, 0.3 * L], [0, L], [0.5 * w, 0.3 * L], [0.2 * w, -k]]);
 const cubukIbre = (L, w, k) => duzIbre([[-w / 2, -k], [-w / 2, L - 0.9], [0, L], [w / 2, L - 0.9], [w / 2, -k]]);
+function yaprak(L, w, k, kal = 0.16) {
+  // yaprak (feuille) ibre: incecik sap, ortada genişleyen, sivri uçlu
+  const s = new THREE.Shape();
+  s.moveTo(-0.16, -k);
+  s.lineTo(-0.16, 0.12 * L);
+  s.quadraticCurveTo(-w * 0.62, 0.52 * L, 0, L);
+  s.quadraticCurveTo(w * 0.62, 0.52 * L, 0.16, 0.12 * L);
+  s.lineTo(0.16, -k);
+  const g = new THREE.ExtrudeGeometry(s, { depth: kal, bevelEnabled: true, bevelThickness: 0.03, bevelSize: 0.03, bevelSegments: 1, curveSegments: 24 });
+  g.translate(0, 0, -kal);
+  return g;
+}
 const IBRE_STIL = {
   klasik:  { akrep: () => dauphine(8.6, 1.3, 1.7), yelkovan: () => dauphine(12.6, 1.05, 2.0) },
   rakamli: { akrep: () => kilic(8.0, 1.25, 1.6), yelkovan: () => kilic(12.3, 0.95, 1.9) },
   sektor:  { akrep: () => cubukIbre(8.4, 0.6, 1.6), yelkovan: () => cubukIbre(12.6, 0.45, 1.9) },
+  roma:    { akrep: () => yaprak(8.3, 1.55, 1.5), yelkovan: () => yaprak(12.5, 1.2, 1.8) },
 };
 const akrep = new THREE.Group(), yelkovan = new THREE.Group(), saniye = new THREE.Group();
 akrep.position.z = 0.6; yelkovan.position.z = 1.0; saniye.position.z = 1.55;
@@ -647,8 +694,51 @@ function ibreleriKur() {
 
 // mekanizma (NH35/NH38 benzeri, sadeleştirilmiş)
 const mek = P.mekanizma;
-mek.add(silindir(13.7, 4.7, 128, M.rodaj, -0.4 - 2.35));
 const balansKonum = new THREE.Vector2(6.85 * Math.sin(THREE.MathUtils.degToRad(265)), 6.85 * Math.cos(THREE.MathUtils.degToRad(265)));
+mek.add(silindir(13.7, 3.5, 128, M.rodaj, -1.6 - 1.75));               // alt gövde (z -5.1 .. -1.6)
+{
+  // üst plaka: NH38A'daki açık kalp boşluğu (balans ön yüzden görünür)
+  const s = new THREE.Shape(); s.absarc(0, 0, 13.7, 0, Math.PI * 2, false);
+  const d = new THREE.Path(); d.absarc(balansKonum.x, balansKonum.y, 4.1, 0, Math.PI * 2, true); s.holes.push(d);
+  const m = new THREE.Mesh(new THREE.ExtrudeGeometry(s, { depth: 1.2, bevelEnabled: false, curveSegments: 72 }), M.rodaj);
+  m.position.z = -1.6; mek.add(m);
+  const taban = new THREE.Mesh(new THREE.CircleGeometry(4.1, 48), new THREE.MeshStandardMaterial({ color: 0x8d9198, metalness: 1, roughness: 0.5 }));
+  taban.position.set(balansKonum.x, balansKonum.y, -1.59); mek.add(taban);
+  // balans köprüsü (tek kollu), kalbin üstünden merkeze uzanır
+  const kopru = new THREE.Mesh(new THREE.BoxGeometry(5.2, 1.1, 0.35), M.rodaj);
+  kopru.position.set(balansKonum.x + 2.6, balansKonum.y + 1.6, -0.62); kopru.rotation.z = 0.55; mek.add(kopru);
+}
+const balansOn = new THREE.Group();
+{
+  balansOn.add(new THREE.Mesh(new THREE.TorusGeometry(3.3, 0.17, 10, 96), M.altin));
+  for (let i = 0; i < 3; i++) { const k = new THREE.Mesh(new THREE.BoxGeometry(6.6, 0.16, 0.12), M.altin); k.rotation.z = i * Math.PI / 3; balansOn.add(k); }
+  const spiral = []; for (let t = 0; t < 1; t += 0.005) { const a = t * Math.PI * 22, r = 0.5 + t * 2.1; spiral.push(new THREE.Vector3(Math.cos(a) * r, Math.sin(a) * r, 0.2)); }
+  balansOn.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(spiral), new THREE.LineBasicMaterial({ color: 0x8c96a8 })));
+  balansOn.add(silindir(0.22, 0.4, 20, M.yakut, 0.25));
+  balansOn.position.set(balansKonum.x, balansKonum.y, -1.05);
+}
+mek.add(balansOn);
+// tarih diski: bugünün tarihi saat 3'teki pencerede
+const tarihDiski = (() => {
+  const c = tuval(1024, 1024), x = c.getContext('2d'), olc = 1024 / 24.4;
+  x.fillStyle = '#f4f2ec'; x.fillRect(0, 0, 1024, 1024);
+  x.fillStyle = '#16181c'; x.font = `600 ${1.55 * olc}px "IBM Plex Sans", Arial, sans-serif`; x.textAlign = 'center'; x.textBaseline = 'middle';
+  for (let n = 1; n <= 31; n++) {
+    const f = (n - 1) * 360 / 31, a = THREE.MathUtils.degToRad(f);
+    x.save(); x.translate((10.55 * Math.sin(a) + 12.2) * olc, (12.2 - 10.55 * Math.cos(a)) * olc);
+    x.rotate(THREE.MathUtils.degToRad(f - 90)); x.fillText(String(n), 0, 0); x.restore();
+  }
+  const doku = new THREE.CanvasTexture(c); doku.colorSpace = THREE.SRGBColorSpace;
+  const g = new THREE.RingGeometry(8.8, 12.2, 96);
+  const uv = g.attributes.uv, pos = g.attributes.position;
+  for (let i = 0; i < uv.count; i++) uv.setXY(i, pos.getX(i) / 24.4 + 0.5, pos.getY(i) / 24.4 + 0.5);
+  const m = new THREE.Mesh(g, new THREE.MeshStandardMaterial({ map: doku, roughness: 0.6 }));
+  m.position.z = -0.32;
+  const gun = new Date().getDate();
+  m.rotation.z = -THREE.MathUtils.degToRad(90 - (gun - 1) * 360 / 31);
+  return m;
+})();
+mek.add(tarihDiski);
 {
   const kopru = new THREE.Shape(); kopru.absarc(0, 0, 13.0, 0, Math.PI * 2, false);
   const delik = new THREE.Path(); delik.absarc(balansKonum.x, balansKonum.y, 4.7, 0, Math.PI * 2, true);
@@ -704,25 +794,23 @@ P.kapakKumbet.add(silindir(11.55, 1.0, 96, M.cam, -7.72 + 0.5));
   }
 }
 
-// hazır klasik kasa (yuvarlak, ~38 mm): Faz 1'in temsili
-{
-  P.kasaKlasik.add(torna([[14.9, 4.2], [16.4, 4.2], [18.3, 3.55], [19.1, 2.7], [19.1, -5.2], [18.5, -6.45], [17.0, -6.45], [14.75, -0.6], [14.65, 2.36], [14.9, 4.2]], 192, M.celik));
-  P.kasaKlasik.add(torna([[13.65, 0.0], [15.0, 2.36]], 192, M.celikMat));
+// hazır klasik kasa: gövde CAD'den (klasik_kasa), kurma kolu tırtıllı
+function tirtilliKol(r, boy, dis = 32) {
   const sekil = new THREE.Shape();
-  const prof = [[16.5, 2.3], [21.2, 0.9], [23.1, 0.1], [23.4, -0.6], [23.4, -4.6], [22.6, -5.5], [16.5, -5.9]];
-  sekil.moveTo(...prof[0]); prof.slice(1).forEach((p) => sekil.lineTo(...p));
-  for (const sx of [1, -1]) for (const sy of [1, -1]) {
-    const g = new THREE.ExtrudeGeometry(sekil, { depth: 1.8, bevelEnabled: true, bevelThickness: 0.25, bevelSize: 0.25, bevelSegments: 3 });
-    g.applyMatrix4(new THREE.Matrix4().set(0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1));
-    const m = new THREE.Mesh(g, M.celik);
-    m.scale.y = sy; m.position.x = sx > 0 ? 10.25 : -12.05;
-    P.kasaKlasik.add(m);
+  for (let i = 0; i <= dis * 2; i++) {
+    const a = (i / (dis * 2)) * Math.PI * 2, rr = i % 2 ? r : r - 0.18;
+    i === 0 ? sekil.moveTo(rr * Math.cos(a), rr * Math.sin(a)) : sekil.lineTo(rr * Math.cos(a), rr * Math.sin(a));
   }
-  P.kapakKlasik.add(torna([[11.5, -7.45], [16.0, -7.2], [17.0, -6.45]], 160, M.celikMat));
-  P.kapakKlasik.add(silindir(11.6, 0.9, 96, M.cam, -7.0));
-  const kol = new THREE.Mesh(new THREE.CylinderGeometry(2.9, 2.9, 2.4, 40), M.celik);
-  kol.rotation.z = -Math.PI / 2; kol.position.set(19.1 + 0.6 + 1.2, 0, -2.32);
-  P.kolKlasik.add(kol);
+  const g = new THREE.ExtrudeGeometry(sekil, { depth: boy, bevelEnabled: true, bevelThickness: 0.25, bevelSize: 0.2, bevelSegments: 3 });
+  g.rotateY(Math.PI / 2);                     // ekseni X'e çevir
+  return new THREE.Mesh(g, M.celik);
+}
+{
+  const kol = tirtilliKol(2.9, 2.2); kol.position.set(19.5 + 0.7, 0, -2.32);
+  const tup = new THREE.Mesh(new THREE.CylinderGeometry(1.25, 1.25, 0.9, 24), M.celik);
+  tup.rotation.z = -Math.PI / 2; tup.position.set(19.5 + 0.35, 0, -2.32);
+  P.kolKlasik.add(kol, tup);
+  P.kapakKlasik.add(silindir(11.55, 1.0, 96, M.cam, -7.72 + 0.5));
 }
 
 // kordon (bileği saran yay boyunca)
@@ -739,11 +827,38 @@ function kordonGeo(isaret) {
     const a = i * 4 + k, b = i * 4 + (k + 1) % 4, c = a + 4, d = b + 4;
     if (isaret > 0) idx.push(a, c, b, b, c, d); else idx.push(a, b, c, b, d, c);
   }
+  const uv = [];
+  for (let i = 0; i <= n; i++) for (let k = 0; k < 4; k++) uv.push(i / n, k === 1 || k === 2 ? 1 : 0);   // üst ve alt yüz dokunun tamamını alır
   const g = new THREE.BufferGeometry();
   g.setAttribute('position', new THREE.Float32BufferAttribute(poz, 3));
+  g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
   g.setIndex(idx); g.computeVertexNormals();
   return g;
 }
+// kroko desenli deri: düzensiz pullar arasında koyu oluklar
+const krokoDoku = (() => {
+  // kordon boyunca (u) sıralar, enine (v) ortada iri, kenarlarda küçük pullar; aralarda ince koyu oluk
+  const c = tuval(512, 512), x = c.getContext('2d');
+  x.fillStyle = '#1c0f08'; x.fillRect(0, 0, 512, 512);
+  let tohum = 11; const rs = () => ((tohum = (tohum * 16807) % 2147483647) / 2147483647);
+  const seritler = [0, 70, 150, 250, 362, 442, 512];      // enine şeritler: ortadaki iki şerit iri
+  for (let k = 0; k < seritler.length - 1; k++) {
+    const v0 = seritler[k], v1 = seritler[k + 1];
+    for (let u = -rs() * 40; u < 512;) {
+      const w = (v1 - v0) * (0.55 + rs() * 0.35);
+      const ton = 52 + rs() * 22;
+      const grd = x.createLinearGradient(0, v0, 0, v1);
+      grd.addColorStop(0, `rgb(${ton + 26},${ton - 4},${ton - 26})`);
+      grd.addColorStop(1, `rgb(${ton + 10},${ton - 14},${ton - 32})`);
+      x.fillStyle = grd;
+      x.beginPath(); x.roundRect(u + 2.5, v0 + 2.5, w - 5, v1 - v0 - 5, 6); x.fill();
+      u += w;
+    }
+  }
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace;
+  t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(4, 1);
+  return t;
+})();
 const kordonMat = new THREE.MeshPhysicalMaterial({ color: 0x8a5631, roughness: 0.72, sheen: 0.6, sheenRoughness: 0.6, sheenColor: 0x6b4a33, side: THREE.DoubleSide });
 const kordon = new THREE.Group();
 kordon.add(new THREE.Mesh(kordonGeo(1), kordonMat), new THREE.Mesh(kordonGeo(-1), kordonMat));
@@ -775,13 +890,17 @@ for (const [ad, [baslik, alt, biz]] of Object.entries(ETIKET)) {
 }
 
 // ---------- seçimleri uygula ----------
-const KORDON_RENK = { taba: 0x8a5631, siyah: 0x1d1d20 };
+const KORDON_RENK = { taba: 0x8a5631, siyah: 0x1d1d20, kroko: 0xffffff };
 function uygula() {
   const kumbet = S.kasa === 'kumbet';
   for (const ad of ['kasaKumbet', 'kapakKumbet', 'kolKumbet']) P[ad].visible = kumbet;
   for (const ad of ['kasaKlasik', 'kapakKlasik', 'kolKlasik']) P[ad].visible = !kumbet;
   kordon.visible = S.kordon !== 'yok' && S.gorunum !== 'parca';
   if (KORDON_RENK[S.kordon]) kordonMat.color.setHex(KORDON_RENK[S.kordon]);
+  const kroko = S.kordon === 'kroko';
+  if ((kordonMat.map === krokoDoku) !== kroko) { kordonMat.map = kroko ? krokoDoku : null; kordonMat.bumpMap = kroko ? krokoDoku : null; kordonMat.bumpScale = 2; kordonMat.needsUpdate = true; }
+  M.celik.color.setHex(METAL_RENK[S.metal]);
+  M.celikMat.color.setHex(METAL_RENK[S.metal]).multiplyScalar(0.94);
   M.ibre.color.setHex(IBRE_RENK[S.ibre]);
   document.getElementById('kasa-rozet').textContent = kumbet ? 'Kasa: 12 köşe · özel tasarım (Faz 2)' : 'Kasa: hazır klasik · bütçe içi';
   const patlat = S.gorunum === 'parca';
@@ -831,7 +950,7 @@ boyutla();
 // ---------- yükleme ----------
 uygula();
 Promise.all([
-  maskeAl(S.stil + (S.tarih === 'var' ? '_tarihli' : '')),
+  maskeAl(maskeAdi()),
   // GLB, yayın ortamı .glb sunmadığı için base64 metin olarak geliyor
   fetch('varlik/kasa_glb.txt').then((r) => { if (!r.ok) throw new Error('kasa modeli: ' + r.status); return r.text(); }).then((b64) => {
     const ham = atob(b64.trim()), bayt = new Uint8Array(ham.length);
@@ -842,7 +961,8 @@ Promise.all([
       if (!o.isMesh) return;
       const ad = o.name || o.parent?.name || '';
       if (ad.includes('orta_kasa')) { o.material = M.celik; P.kasaKumbet.add(o.clone()); }
-      else if (ad.includes('arka_kapak')) { o.material = M.celikMat; P.kapakKumbet.add(o.clone()); }
+      else if (ad.includes('klasik_kasa')) { o.material = M.celik; P.kasaKlasik.add(o.clone()); }
+      else if (ad.includes('arka_kapak')) { o.material = M.celikMat; P.kapakKumbet.add(o.clone()); P.kapakKlasik.add(o.clone()); }
       else if (ad.includes('halkasi')) { o.material = M.plastik; P.halka.add(o.clone()); }
     });
   }),
@@ -866,6 +986,7 @@ function kare(simdi) {
   saniye.rotation.z = -sn / 60 * Math.PI * 2;
   const t = simdi / 1000;
   balans.rotation.z = 3.4 * Math.sin(t * Math.PI * 6);                         // 3 Hz salınım
+  balansOn.rotation.z = -balans.rotation.z;
   rotor.rotation.z = 0.9 * Math.sin(t * 0.35) + 0.4 * Math.sin(t * 0.9);
   const patlat = S.gorunum === 'parca', h = azHareket ? 1 : 0.09;
   for (const [ad, z] of Object.entries(PATLAT)) {

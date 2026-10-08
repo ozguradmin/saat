@@ -1,3 +1,5 @@
 __pycache__/
 *.pyc
 tasarim/kadran/cikti/doku_maskeler*.png
+tasarim/kadran/cikti/kadran_*_ayakli.png
+tasarim/kadran/cikti/kadran_*_ayakli.svg

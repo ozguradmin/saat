@@ -7,10 +7,12 @@ Kadranı tek bir geometriden iki üretim yoluna hazırlar:
   * PCB:   Gerber + Excellon delik dosyaları (0.4 mm FR4, ENIG altın, siyah/mavi/yeşil maske)
   * Önizleme PNG/SVG'leri ve 3D önizleme sayfası için maske dokusu
 
-Üç stil var (PARAM["stil"]):
+Dört stil var (PARAM["stil"]):
   klasik  -> ince çubuk saat işaretleri, 12'de çift çubuk
   rakamli -> 12, 3, 6, 9'da rakamlar, diğer saatlerde çubuk
   sektor  -> eş merkezli halkalar, 1-12 rakamlı saat halkası, ince artı çizgisi
+  roma    -> Roma rakamları (XII, III, VI, IX), yaprak işaretler, demiryolu dakika halkası,
+             merkezde dalgalı guilloché; NH38A ile açık kalp penceresi (kalp_penceresi=true)
 
 Katmanların anlamı (üstten bakınca):
   altın -> lehim maskesi açılmış bakır = ENIG altın görünür (lazerde: kaplaması yakılan alan)
@@ -55,6 +57,11 @@ PARAM = {
     "tarih_pencere_r": 10.55, # Seiko föyü: pencere merkezi 10.55 mm, saat 3 yönü
     "tarih_pencere_g": 2.90,  # pencere genişliği (radyal)
     "tarih_pencere_y": 2.00,  # pencere yüksekliği (teğetsel)
+    "kalp_penceresi": False,  # NH38A için açık kalp: balans çarkını gösteren yuvarlak pencere
+    "kalp_cap": 7.60,         # Seiko föyü: en fazla Ø10.00
+    "kalp_r": 6.85,           # Seiko föyü: pencere merkezi r = 6.85 mm
+    "kalp_aci": 265.0,        # Seiko föyü: saat 12'den saat yönünde 265° (9'un hemen altı)
+    "dxf_doku": False,        # True: guilloché dokusu DXF'e DOKU katmanı olarak eklenir (gümüş-siyah levhada ince koyu çizgi olur)
     # --- logo ---
     "logo": None,             # None -> stilin kendi yazımı (OZGUR / ozgur); istenirse "özgür" vb.
     # --- dakika halkası (ortak) ---
@@ -71,6 +78,8 @@ STILLER = {
     "klasik": {"logo": "OZGUR", "font": "Marcellus-Regular.ttf", "boy": 1.15, "aralik": 0.42, "olcu": "H", "logo_y": 6.15},
     "rakamli": {"logo": "ozgur", "font": "Jost-Medium.ttf", "boy": 1.25, "aralik": 0.06, "olcu": "x", "logo_y": 5.75},
     "sektor": {"logo": "OZGUR", "font": "Jost-Regular.ttf", "boy": 0.95, "aralik": 0.45, "olcu": "H", "logo_y": 4.40},
+    "roma": {"logo": "OZGUR", "font": "Cinzel-Medium.ttf", "boy": 1.05, "aralik": 0.38, "olcu": "H", "logo_y": 5.35,
+             "isinsal": False},
 }
 
 RENKLER = {
@@ -88,6 +97,16 @@ RENKLER = {
         "maske": (0.02, 0.20, 0.13),
         "maske_kabartma": (0.04, 0.30, 0.20),
         "altin": (0.93, 0.76, 0.42),
+    },
+    "gumus": {    # gümüş üstü siyah lazer levhası: işaretler koyu
+        "maske": (0.80, 0.81, 0.82),
+        "maske_kabartma": (0.69, 0.70, 0.72),
+        "altin": (0.07, 0.08, 0.10),
+    },
+    "beyaz": {    # beyaz maske + ENIG: işaretler altın, maske altı bakır krem doku verir
+        "maske": (0.95, 0.94, 0.91),
+        "maske_kabartma": (0.90, 0.85, 0.74),
+        "altin": (0.86, 0.69, 0.38),
     },
 }
 
@@ -219,7 +238,53 @@ def stil_sektor(P):
     return altin, golge
 
 
-STIL_FONK = {"klasik": stil_klasik, "rakamli": stil_rakamli, "sektor": stil_sektor}
+def yaprak_isaret(r0, r1, gen, aci):
+    """Mızrak/yaprak biçimli saat işareti: iki ucu sivri, en geniş yeri iç uca yakın."""
+    rg = r0 + (r1 - r0) * 0.32
+    pg = Polygon([(0, r0), (gen / 2, rg), (0, r1), (-gen / 2, rg)])
+    return affinity.rotate(pg, -aci, origin=(0, 0))
+
+
+def roma_rakami(metin, h, r, boy=2.25):
+    """Rakamı ışınsal yönlendirir (tabanı merkeze bakar); alt yarıdakiler ters durmasın diye 180° çevrilir."""
+    g = yazi(metin, boy, "Cinzel-Medium.ttf", aralik=0.06)
+    g = ortala(g, 0, 0)
+    aci = 30 * h
+    if 120 <= aci <= 240:
+        aci += 180
+    g = affinity.rotate(g, -aci, origin=(0, 0))
+    return affinity.translate(g, *kutup(r, 30 * h))
+
+
+def stil_roma(P):
+    altin, golge = [], []
+    # demiryolu dakika halkası: iki ince çember, arada 60 çentik
+    altin += [halka(13.30, 0.12), halka(12.80, 0.12)]
+    for m in range(60):
+        gen = 0.22 if m % 5 == 0 else 0.12
+        altin.append(cizgi(kutup(12.80, 6 * m), kutup(13.30, 6 * m), gen))
+    # saat halkasını merkezden ayıran ince çember
+    altin.append(halka(9.20, 0.10))
+    roma = {0: "XII", 3: "III", 6: "VI", 9: "IX"}
+    for h in range(12):
+        if h == 3 and P["tarih_penceresi"]:
+            continue
+        if h == 9 and P["kalp_penceresi"]:
+            continue
+        if h in roma:
+            altin.append(roma_rakami(roma[h], h, 11.05))
+        else:
+            altin.append(yaprak_isaret(10.20, 12.35, 0.78, 30 * h))
+    # merkez guilloché: komşu halkalarda faz kaydırılmış dalgalar -> arpa tanesi (barleycorn) örgüsü
+    th = np.linspace(0, 2 * np.pi, 1440, endpoint=False)
+    for k, r0 in enumerate(np.arange(2.35, 8.90, 0.17)):
+        r = r0 + 0.065 * np.sin(48 * th + (np.pi if k % 2 else 0.0))
+        pts = list(zip(r * np.sin(th), r * np.cos(th)))
+        golge.append(Polygon(pts).exterior.buffer(0.032))
+    return altin, golge
+
+
+STIL_FONK = {"klasik": stil_klasik, "rakamli": stil_rakamli, "sektor": stil_sektor, "roma": stil_roma}
 
 
 # ----------------------------------------------------------------------------
@@ -239,12 +304,13 @@ def geometri(P):
     altin = unary_union(altin).difference(temiz).union(logo)
 
     # ışınsal doku (PCB'de maske altı bakır): çizgiler merkeze yakın sıklaşmasın diye kademeli başlar
-    if P["isinsal_doku"]:
+    if P["isinsal_doku"] and S.get("isinsal", True):
         ic_sinir = 9.05 if P["stil"] == "sektor" else P["dakika_ic"] - 0.45
         for k in range(240):
             r0 = 2.2 + ((k * 0.6180339887) % 1.0) * 3.4   # düzensiz başlangıç: halka izi oluşmaz
             golge.append(cizgi(kutup(r0, 1.5 * k), kutup(ic_sinir - 0.2, 1.5 * k), 0.09))
     golge = unary_union(golge) if golge else Polygon()
+    golge = golge.difference(unary_union(yazilar).buffer(0.45))
 
     # --- kesimler ---
     kart = Point(0, 0).buffer(R, 1440)
@@ -262,6 +328,13 @@ def geometri(P):
         kesim.append(pen)
         cerceve = pen.buffer(0.36, join_style=1).difference(pen.buffer(0.22, join_style=1))
         altin = altin.difference(pen.buffer(0.58)).union(cerceve)
+    if P["kalp_penceresi"]:
+        c = kutup(P["kalp_r"], P["kalp_aci"])
+        pen = Point(*c).buffer(P["kalp_cap"] / 2, 256)
+        kesim.append(pen)
+        cerceve = Point(*c).buffer(P["kalp_cap"] / 2 + 0.42, 256).difference(Point(*c).buffer(P["kalp_cap"] / 2 + 0.22, 256))
+        altin = altin.difference(Point(*c).buffer(P["kalp_cap"] / 2 + 0.62, 256)).union(cerceve)
+        golge = golge.difference(Point(*c).buffer(P["kalp_cap"] / 2 + 0.62, 256))
     kesim_hepsi = unary_union(delikler + kesim)
 
     # bakır serbest bölge: kenar payı, merkez delik ve diğer deliklerin çevresi
@@ -532,10 +605,11 @@ def svg_kaydet(G, P, renk, yol):
     Path(yol).write_text("\n".join(svg))
 
 
-def dxf_kaydet(G, yol):
+def dxf_kaydet(G, yol, doku=False):
     """Lazer atölyeleri için DXF: KESIM (dış hat + delikler) ve ALTIN (lazerle açılacak alanlar).
 
-    Ton-sür-ton GOLGE katmanı bilerek yok: siyah-altın levhada her lazer izi altını açar.
+    Ton-sür-ton doku varsayılan olarak yok: siyah-altın levhada her lazer izi altını açar.
+    dxf_doku=True ile DOKU katmanı eklenir (gümüş-siyah levhada ince koyu guilloché çizgisi olur).
     """
     import ezdxf
 
@@ -558,6 +632,9 @@ def dxf_kaydet(G, yol):
     for k in G["kesimler"]:
         halkalar(k, "KESIM")
     halkalar(G["altin"], "ALTIN")
+    if doku:
+        doc.layers.add("DOKU", color=8)
+        halkalar(G["golge"], "DOKU")
     doc.saveas(yol)
 
 
@@ -574,9 +651,10 @@ def main():
         else:
             P[k] = type(PARAM[k])(v)
     G = geometri(P)
-    ek = "_" + P["stil"] + ("_tarihli" if P["tarih_penceresi"] else "") + ("_ayakli" if P["ayak_delikleri"] else "")
+    ek = "_" + P["stil"] + ("_tarihli" if P["tarih_penceresi"] else "") + ("_kalpli" if P["kalp_penceresi"] else "") \
+        + ("_ayakli" if P["ayak_delikleri"] else "") + ("_dokulu" if P["dxf_doku"] else "")
     gerber_paketi(G, P, cikti / "ozgur_kadran{}_gerber.zip".format(ek))
-    dxf_kaydet(G, cikti / "ozgur_kadran{}_lazer.dxf".format(ek))
+    dxf_kaydet(G, cikti / "ozgur_kadran{}_lazer.dxf".format(ek), doku=P["dxf_doku"])
     svg_kaydet(G, P, "gece", cikti / "kadran_gece{}.svg".format(ek))
     # 3D önizleme için paketlenmiş maske: R = altın, G = maske altı bakır, B = kart
     from PIL import Image

@@ -71,28 +71,43 @@ def poligon12(r, z=0.0, faz=15.0):
             for k in range(12)]
 
 
-def orta_kasa(P):
+def orta_kasa(P, bicim="kumbet"):
+    """bicim="kumbet": 12 yüzlü gövde + yüzeyli bezel; bicim="klasik": yuvarlak gövde + kubbe bezel."""
     z_cam_alt = P["ibre_boslugu"]
     z_cam_ust = z_cam_alt + P["cam_kal"]
     z_govde_ust = z_cam_ust - P["bezel_yuk"] - 0.10   # cam bezelden 0.1 mm taşar
     z_alt = P["kasa_alt_z"]
 
-    # 12 yüzlü gövde
-    govde = (cq.Workplane("XY").workplane(offset=z_alt)
-             .polyline(poligon12(P["govde_r"])).close()
-             .extrude(z_govde_ust - z_alt))
-    # konik "kümbet çatısı": iki 12'gen arasında loft -> düzlemsel yüzeyler
-    cati = (cq.Workplane("XY").workplane(offset=z_govde_ust)
-            .polyline(poligon12(P["govde_r"])).close()
-            .workplane(offset=P["bezel_yuk"])
-            .polyline(poligon12(P["bezel_ust_r"] / math.cos(math.radians(15)))).close()
-            .loft(ruled=True))
-    kasa = govde.union(cati)
+    if bicim == "kumbet":
+        # 12 yüzlü gövde
+        govde = (cq.Workplane("XY").workplane(offset=z_alt)
+                 .polyline(poligon12(P["govde_r"])).close()
+                 .extrude(z_govde_ust - z_alt))
+        # konik "kümbet çatısı": iki 12'gen arasında loft -> düzlemsel yüzeyler
+        cati = (cq.Workplane("XY").workplane(offset=z_govde_ust)
+                .polyline(poligon12(P["govde_r"])).close()
+                .workplane(offset=P["bezel_yuk"])
+                .polyline(poligon12(P["bezel_ust_r"] / math.cos(math.radians(15)))).close()
+                .loft(ruled=True))
+        kasa = govde.union(cati)
+        yi = P["govde_r"] * math.cos(math.radians(15)) - 1.2
+        kulp_ust = z_govde_ust - 0.2
+    else:
+        # yuvarlak gövde: düz yan, üstte çeyrek elips kesitli cilalı kubbe bezel
+        r_dis, r_ust, z_yan = P["govde_r"], P["bezel_ust_r"] - 0.55, 1.55
+        z_bezel = z_cam_ust - 0.10
+        kesit = [(0, z_alt), (r_dis - 0.6, z_alt), (r_dis, z_alt + 0.6), (r_dis, z_yan)]
+        for i in range(1, 25):
+            t = math.radians(90 * i / 24)
+            kesit.append((r_ust + (r_dis - r_ust) * math.cos(t), z_yan + (z_bezel - z_yan) * math.sin(t)))
+        kesit += [(r_ust - 0.45, z_bezel), (0, z_bezel)]
+        kasa = cq.Workplane("XZ").polyline(kesit).close().revolve(360, (0, 0, 0), (0, 1, 0))
+        yi = math.sqrt(r_dis ** 2 - (P["kordon_gen"] / 2 + P["kulp_kal"]) ** 2) - 1.0
+        kulp_ust = z_yan + 0.9
 
     # kulplar (yan profil YZ düzleminde çizilip X boyunca uzatılır)
-    yi = P["govde_r"] * math.cos(math.radians(15)) - 1.2
     profil = [
-        (yi, z_govde_ust - 0.2),
+        (yi, kulp_ust),
         (P["kulp_uc_y"] - 1.2, z_govde_ust - 2.0),
         (P["kulp_uc_y"], z_govde_ust - 2.6),
         (P["kulp_uc_y"], z_alt + 1.05),
@@ -219,6 +234,7 @@ def main():
     P = PARAM
     parcalar = {
         "orta_kasa": orta_kasa(P),
+        "klasik_kasa": orta_kasa(P, "klasik"),
         "arka_kapak": arka_kapak(P),
         "mekanizma_halkasi": mekanizma_halkasi(P),
     }

@@ -1,0 +1,15 @@
+{
+  "stil": "roma",
+  "cap_mm": 28.5,
+  "yazi_sinirlari": [
+    [
+      -3.36,
+      4.8,
+      3.36,
+      5.9
+    ]
+  ],
+  "altin_alan_mm2": 43.22,
+  "golge_alan_mm2": 84.77,
+  "tarih_penceresi": true
+}
