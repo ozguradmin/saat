@@ -78,8 +78,8 @@ STILLER = {
     "klasik": {"logo": "OZGUR", "font": "Marcellus-Regular.ttf", "boy": 1.15, "aralik": 0.42, "olcu": "H", "logo_y": 6.15},
     "rakamli": {"logo": "ozgur", "font": "Jost-Medium.ttf", "boy": 1.25, "aralik": 0.06, "olcu": "x", "logo_y": 5.75},
     "sektor": {"logo": "OZGUR", "font": "Jost-Regular.ttf", "boy": 0.95, "aralik": 0.45, "olcu": "H", "logo_y": 4.40},
-    "roma": {"logo": "OZGUR", "font": "Cinzel-Medium.ttf", "boy": 1.05, "aralik": 0.38, "olcu": "H", "logo_y": 5.35,
-             "isinsal": False},
+    "roma": {"logo": "OZGUR", "font": "Cinzel-Medium.ttf", "boy": 1.40, "aralik": 0.32, "olcu": "H", "logo_y": 5.35,
+             "kalin": 0.045, "isinsal": False, "plaket": 0.50},
 }
 
 RENKLER = {
@@ -103,10 +103,15 @@ RENKLER = {
         "maske_kabartma": (0.69, 0.70, 0.72),
         "altin": (0.07, 0.08, 0.10),
     },
-    "beyaz": {    # beyaz maske + ENIG: işaretler altın, maske altı bakır krem doku verir
+    "beyaz": {    # beyaz maske + ENIG: işaretler soluk altın; beyaz maskede alttaki bakır neredeyse görünmez
         "maske": (0.95, 0.94, 0.91),
-        "maske_kabartma": (0.90, 0.85, 0.74),
-        "altin": (0.86, 0.69, 0.38),
+        "maske_kabartma": (0.935, 0.92, 0.88),
+        "altin": (0.85, 0.76, 0.52),
+    },
+    "beyazsiyah": {   # beyaz üstü siyah lazer levhası (Halsa Edico Beyaz-Siyah): işaretler siyah
+        "maske": (0.94, 0.94, 0.92),
+        "maske_kabartma": (0.70, 0.70, 0.70),
+        "altin": (0.06, 0.07, 0.09),
     },
 }
 
@@ -129,11 +134,38 @@ def halka(r, gen, seg=720):
     return Point(0, 0).buffer(r + gen / 2, seg).difference(Point(0, 0).buffer(r - gen / 2, seg))
 
 
-def yazi(metin, boy, font, aralik=0.0, olcu="H"):
+def _glif(tp, kalin=0.0):
+    """TextPath konturlarını sıfırdan farklı sarma kuralıyla tek çokgene çevirir.
+
+    XOR (symmetric_difference) kullanılırsa üst üste binen konturlar (Cinzel'de X, V, Z
+    harflerinin kesişen kolları) birbirini siler; burada dış konturlar birleştirilir,
+    ters yönlü (delik) konturlar çıkarılır.
+    """
+    konturlar = []
+    for h in tp.to_polygons():
+        if len(h) < 3:
+            continue
+        x, y = np.asarray(h)[:, 0], np.asarray(h)[:, 1]
+        alan = 0.5 * float(np.sum(x * np.roll(y, -1) - np.roll(x, -1) * y))
+        if abs(alan) > 1e-9:
+            konturlar.append((alan, Polygon(h).buffer(0)))
+    if not konturlar:
+        return None
+    yon = np.sign(max(konturlar, key=lambda k: abs(k[0]))[0])
+    dis = unary_union([g for a, g in konturlar if a * yon > 0])
+    ic = unary_union([g for a, g in konturlar if a * yon < 0]) if any(a * yon < 0 for a, _ in konturlar) else None
+    geo = dis.difference(ic) if ic is not None else dis
+    if kalin:
+        geo = geo.buffer(kalin, join_style=1)
+    return geo
+
+
+def yazi(metin, boy, font, aralik=0.0, olcu="H", kalin=0.0):
     """Metni shapely çokgenine çevirir; (0,0) taban çizgisinin ortası.
 
     boy: `olcu` harfinin yüksekliği (büyük harf için "H", küçük harf için "x").
     aralik: harfler arasına eklenen boşluk, boy'un katı olarak.
+    kalin: harf başına yuvarlak kalınlaştırma (mm), ince harf çizgilerini üretim sınırının üstüne çıkarır.
     """
     fp = FontProperties(fname=str(FONT_DIR / font))
     ref = TextPath((0, 0), olcu, size=1.0, prop=fp).get_extents()
@@ -144,13 +176,7 @@ def yazi(metin, boy, font, aralik=0.0, olcu="H"):
         if harf == " ":
             x += em * 0.3 + aralik * boy
             continue
-        tp = TextPath((0, 0), harf, size=em, prop=fp)
-        geo = None
-        for h in tp.to_polygons():
-            if len(h) < 3:
-                continue
-            pg = Polygon(h).buffer(0)
-            geo = pg if geo is None else geo.symmetric_difference(pg)
+        geo = _glif(TextPath((0, 0), harf, size=em, prop=fp), kalin)
         if geo is None:
             continue
         minx, _, maxx, _ = geo.bounds
@@ -245,9 +271,9 @@ def yaprak_isaret(r0, r1, gen, aci):
     return affinity.rotate(pg, -aci, origin=(0, 0))
 
 
-def roma_rakami(metin, h, r, boy=2.25):
+def roma_rakami(metin, h, r, boy=2.60):
     """Rakamı ışınsal yönlendirir (tabanı merkeze bakar); alt yarıdakiler ters durmasın diye 180° çevrilir."""
-    g = yazi(metin, boy, "Cinzel-Medium.ttf", aralik=0.06)
+    g = yazi(metin, boy, "Cinzel-Medium.ttf", aralik=0.10, kalin=0.04)
     g = ortala(g, 0, 0)
     aci = 30 * h
     if 120 <= aci <= 240:
@@ -256,31 +282,40 @@ def roma_rakami(metin, h, r, boy=2.25):
     return affinity.translate(g, *kutup(r, 30 * h))
 
 
+DOKU_CIZGILERI = []   # stil_roma'nın guilloché merkez çizgileri (DXF'te tek geçişlik lazer çizgisi için)
+
+
 def stil_roma(P):
     altin, golge = [], []
-    # demiryolu dakika halkası: iki ince çember, arada 60 çentik
-    altin += [halka(13.30, 0.12), halka(12.80, 0.12)]
+    # demiryolu dakika halkası: iki çember (0.16), arada 60 çentik; 5 dakikalar 0.30
+    altin += [halka(13.13, 0.16), halka(12.65, 0.16)]
     for m in range(60):
-        gen = 0.22 if m % 5 == 0 else 0.12
-        altin.append(cizgi(kutup(12.80, 6 * m), kutup(13.30, 6 * m), gen))
-    # saat halkasını merkezden ayıran ince çember
-    altin.append(halka(9.20, 0.10))
+        gen = 0.30 if m % 5 == 0 else 0.16
+        altin.append(cizgi(kutup(12.65, 6 * m), kutup(13.13, 6 * m), gen))
     roma = {0: "XII", 3: "III", 6: "VI", 9: "IX"}
+    rakamlar = []
     for h in range(12):
         if h == 3 and P["tarih_penceresi"]:
             continue
         if h == 9 and P["kalp_penceresi"]:
             continue
         if h in roma:
-            altin.append(roma_rakami(roma[h], h, 11.05))
+            rakamlar.append(roma_rakami(roma[h], h, 10.70))
         else:
-            altin.append(yaprak_isaret(10.20, 12.35, 0.78, 30 * h))
-    # merkez guilloché: komşu halkalarda faz kaydırılmış dalgalar -> arpa tanesi (barleycorn) örgüsü
-    th = np.linspace(0, 2 * np.pi, 1440, endpoint=False)
-    for k, r0 in enumerate(np.arange(2.35, 8.90, 0.17)):
-        r = r0 + 0.065 * np.sin(48 * th + (np.pi if k % 2 else 0.0))
+            altin.append(yaprak_isaret(10.10, 12.25, 0.78, 30 * h))
+    altin += rakamlar
+    # guilloché: aynı fazlı dairesel dalga, bütün alanı kaplar; merkezde düz halkalara,
+    # dış kenarda tek temiz çembere söner. 0.16 çizgi / 0.32 adım -> en dar boşluk ≈ 0.14 mm
+    DOKU_CIZGILERI.clear()
+    th = np.linspace(0, 2 * np.pi, 2880, endpoint=False)
+    for r0 in np.arange(1.45, 12.05 + 1e-6, 0.32):
+        sol = np.clip((12.05 - r0) / 1.2, 0, 1) * np.clip((r0 - 3.0) / 2.0, 0, 1)
+        r = r0 + 0.009 * r0 * sol * np.sin(40 * th)
         pts = list(zip(r * np.sin(th), r * np.cos(th)))
-        golge.append(Polygon(pts).exterior.buffer(0.032))
+        cizgi_ = Polygon(pts).exterior
+        DOKU_CIZGILERI.append(cizgi_)
+        golge.append(cizgi_.buffer(0.08))
+    golge = [unary_union(golge).difference(unary_union([g.convex_hull for g in rakamlar]).buffer(0.22))]
     return altin, golge
 
 
@@ -296,7 +331,7 @@ def geometri(P):
     S = STILLER[P["stil"]]
     altin, golge = STIL_FONK[P["stil"]](P)
 
-    logo = yazi(P["logo"] or S["logo"], S["boy"], S["font"], aralik=S["aralik"], olcu=S["olcu"])
+    logo = yazi(P["logo"] or S["logo"], S["boy"], S["font"], aralik=S["aralik"], olcu=S["olcu"], kalin=S.get("kalin", 0.0))
     logo = ortala(logo, 0, S["logo_y"])
     yazilar = [logo]
     # diğer altın öğeler (ör. sektör stilindeki artı çizgisi) logoya 0.35 mm'den fazla yaklaşmasın
@@ -308,9 +343,13 @@ def geometri(P):
         ic_sinir = 9.05 if P["stil"] == "sektor" else P["dakika_ic"] - 0.45
         for k in range(240):
             r0 = 2.2 + ((k * 0.6180339887) % 1.0) * 3.4   # düzensiz başlangıç: halka izi oluşmaz
-            golge.append(cizgi(kutup(r0, 1.5 * k), kutup(ic_sinir - 0.2, 1.5 * k), 0.09))
+            golge.append(cizgi(kutup(r0, 1.5 * k), kutup(ic_sinir - 0.2, 1.5 * k), 0.10))   # maske altı bakır: en az 0.10
     golge = unary_union(golge) if golge else Polygon()
-    golge = golge.difference(unary_union(yazilar).buffer(0.45))
+    if S.get("plaket"):
+        # logonun çevresinde harf harf hale yerine tek, köşeleri yuvarlak temiz alan
+        golge = golge.difference(box(*logo.bounds).buffer(S["plaket"], join_style=1))
+    else:
+        golge = golge.difference(unary_union(yazilar).buffer(0.45))
 
     # --- kesimler ---
     kart = Point(0, 0).buffer(R, 1440)
@@ -324,17 +363,20 @@ def geometri(P):
         c = (P["tarih_pencere_r"], 0.0)
         pen = box(c[0] - P["tarih_pencere_g"] / 2, -P["tarih_pencere_y"] / 2,
                   c[0] + P["tarih_pencere_g"] / 2, P["tarih_pencere_y"] / 2)
-        pen = pen.buffer(-0.35, join_style=1).buffer(0.35, join_style=1)  # freze yarıçapı
+        pen = pen.buffer(-0.50, join_style=1).buffer(0.50, join_style=1)  # freze yarıçapı
         kesim.append(pen)
-        cerceve = pen.buffer(0.36, join_style=1).difference(pen.buffer(0.22, join_style=1))
-        altin = altin.difference(pen.buffer(0.58)).union(cerceve)
+        cerceve = pen.buffer(0.42, join_style=1).difference(pen.buffer(0.25, join_style=1))
+        altin = altin.difference(pen.buffer(0.55)).union(cerceve)
+        golge = golge.difference(pen.buffer(0.60))
     if P["kalp_penceresi"]:
         c = kutup(P["kalp_r"], P["kalp_aci"])
         pen = Point(*c).buffer(P["kalp_cap"] / 2, 256)
         kesim.append(pen)
-        cerceve = Point(*c).buffer(P["kalp_cap"] / 2 + 0.42, 256).difference(Point(*c).buffer(P["kalp_cap"] / 2 + 0.22, 256))
-        altin = altin.difference(Point(*c).buffer(P["kalp_cap"] / 2 + 0.62, 256)).union(cerceve)
-        golge = golge.difference(Point(*c).buffer(P["kalp_cap"] / 2 + 0.62, 256))
+        Rk = P["kalp_cap"] / 2
+        # çerçevenin iç kenarı 0.25 mm bakır payının dışında: net 0.30 mm
+        cerceve = Point(*c).buffer(Rk + 0.60, 256).difference(Point(*c).buffer(Rk + 0.30, 256))
+        altin = altin.difference(Point(*c).buffer(Rk + 0.80, 256)).union(cerceve)
+        golge = golge.difference(Point(*c).buffer(Rk + 0.80, 256))
     kesim_hepsi = unary_union(delikler + kesim)
 
     # bakır serbest bölge: kenar payı, merkez delik ve diğer deliklerin çevresi
@@ -344,6 +386,10 @@ def geometri(P):
         bakir_sinir = bakir_sinir.difference(k.buffer(0.25))
     altin = altin.intersection(bakir_sinir)
     golge = golge.difference(altin.buffer(0.18)).intersection(bakir_sinir)
+    if P["stil"] == "roma" and not golge.is_empty:
+        # 0.15 mm'den ince kıymıkları ve 0.10 mm²'den küçük kırıntıları at
+        golge = golge.buffer(-0.075, join_style=1).buffer(0.075, join_style=1)
+        golge = unary_union([g for g in _poligonlar(golge) if g.area >= 0.10])
 
     bakir = unary_union([altin.buffer(P["bakir_tasma"], join_style=2), golge]).intersection(bakir_sinir)
     maske_acik = altin
@@ -358,6 +404,7 @@ def geometri(P):
         "bakir": bakir,
         "maske_acik": maske_acik,
         "R": R,
+        "doku_cizgileri": list(DOKU_CIZGILERI) if P["stil"] == "roma" else [],
         "yazi_sinirlari": [[round(v, 2) for v in y.bounds] for y in yazilar],
     }
 
@@ -535,6 +582,13 @@ def onizleme(G, P, renk, px=2048, kapsam=None):
     kart = maske(G["kart"].difference(G["kesim_hepsi"]), px, kapsam)
     altin = maske(G["altin"], px, kapsam)
     golge = maske(G["golge"], px, kapsam)
+    if renk in ("gumus", "gece", "beyazsiyah"):     # lazer levhaları
+        if not P["dxf_doku"]:
+            golge = golge * 0.0   # lazer levhasında doku yok: önizleme fazlasını vaat etmesin
+        elif G.get("doku_cizgileri"):
+            # tek geçişlik lazer çizgisi ≈ 0.05 mm: önizlemede de o incelikte göster
+            ince = unary_union([c.buffer(0.03) for c in G["doku_cizgileri"]]).intersection(G["golge"].buffer(0.01))
+            golge = maske(ince, px, kapsam)
     C = RENKLER[renk]
 
     yy, xx = np.mgrid[0:px, 0:px].astype(np.float32)
@@ -575,7 +629,10 @@ def png_kaydet(arr, yol):
         img = Image.fromarray((a * 255).astype(np.uint8), "RGBA")
     else:
         img = Image.fromarray((a * 255).astype(np.uint8), "RGB")
-    img.save(yol, optimize=True)
+    if str(yol).endswith(".webp"):
+        img.save(yol, quality=90, method=6)
+    else:
+        img.save(yol, optimize=True)
 
 
 def svg_kaydet(G, P, renk, yol):
@@ -634,7 +691,16 @@ def dxf_kaydet(G, yol, doku=False):
     halkalar(G["altin"], "ALTIN")
     if doku:
         doc.layers.add("DOKU", color=8)
-        halkalar(G["golge"], "DOKU")
+        if G.get("doku_cizgileri"):
+            # tek geçişlik lazer çizgisi: guilloché merkez çizgileri, yasak bölgelerden kırpılmış
+            izin = G["golge"].buffer(0.01)
+            for c in G["doku_cizgileri"]:
+                parca = c.intersection(izin)
+                for ln in getattr(parca, "geoms", [parca]):
+                    if ln.geom_type == "LineString" and ln.length > 0.2:
+                        msp.add_lwpolyline([(round(x, 4), round(y, 4)) for x, y in ln.coords], dxfattribs={"layer": "DOKU"})
+        else:
+            halkalar(G["golge"], "DOKU")
     doc.saveas(yol)
 
 
@@ -653,19 +719,23 @@ def main():
     G = geometri(P)
     ek = "_" + P["stil"] + ("_tarihli" if P["tarih_penceresi"] else "") + ("_kalpli" if P["kalp_penceresi"] else "") \
         + ("_ayakli" if P["ayak_delikleri"] else "") + ("_dokulu" if P["dxf_doku"] else "")
-    gerber_paketi(G, P, cikti / "ozgur_kadran{}_gerber.zip".format(ek))
+    ana = not (P["tarih_penceresi"] or P["ayak_delikleri"] or P["dxf_doku"])
+    if not P["dxf_doku"]:                       # DOKU yalnız DXF'i değiştirir; Gerber aynı kalır
+        gerber_paketi(G, P, cikti / "ozgur_kadran{}_gerber.zip".format(ek))
     dxf_kaydet(G, cikti / "ozgur_kadran{}_lazer.dxf".format(ek), doku=P["dxf_doku"])
-    svg_kaydet(G, P, "gece", cikti / "kadran_gece{}.svg".format(ek))
-    # 3D önizleme için paketlenmiş maske: R = altın, G = maske altı bakır, B = kart
-    from PIL import Image
-    kapsam = G["R"]
-    kanal = [maske(G["altin"], 2048, kapsam), maske(G["golge"], 2048, kapsam),
-             maske(G["kart"].difference(G["kesim_hepsi"]), 2048, kapsam)]
-    Image.fromarray((np.stack(kanal, axis=2) * 255).astype(np.uint8), "RGB").save(
-        cikti / "doku_maskeler{}.png".format(ek), optimize=True)
-    for renk in RENKLER:
-        H = onizleme(G, P, renk, px=1600)
-        png_kaydet(H["renk"], cikti / "kadran_{}{}.png".format(renk, ek))
+    if ana:
+        svg_kaydet(G, P, "gece", cikti / "kadran_gece{}.svg".format(ek))
+    if not (P["ayak_delikleri"] or P["dxf_doku"]):
+        # 3D önizleme için paketlenmiş maske: R = altın, G = maske altı bakır, B = kart
+        from PIL import Image
+        kapsam = G["R"]
+        kanal = [maske(G["altin"], 2048, kapsam), maske(G["golge"], 2048, kapsam),
+                 maske(G["kart"].difference(G["kesim_hepsi"]), 2048, kapsam)]
+        Image.fromarray((np.stack(kanal, axis=2) * 255).astype(np.uint8), "RGB").save(
+            cikti / "doku_maskeler{}.png".format(ek), optimize=True)
+    for renk in (["gumus", "beyazsiyah"] if P["dxf_doku"] else RENKLER):
+        H = onizleme(G, P, renk, px=1200)
+        png_kaydet(H["renk"], cikti / "kadran_{}{}.webp".format(renk, ek))
     ozet = {
         "stil": P["stil"],
         "cap_mm": P["cap"],

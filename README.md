@@ -21,6 +21,11 @@ Mekanizma, kasa, ibreler ve kordon Türkiye'den hazır alınıyor; kadran Türki
 - **klasik** — ince çubuk saat işaretleri, 12'de çift çubuk, `OZGUR` (Marcellus)
 - **rakamli** — 12, 3, 6, 9 rakamları + çubuklar, `ozgur` (Jost)
 - **sektor** — eş merkezli halkalar, 1–12 rakamları, artı çizgisi, `OZGUR` (Jost)
+- **roma** — XII / III / VI Roma rakamları (Cinzel), yaprak işaretler, demiryolu dakika halkası, dalga desenli zemin;
+  NH38A ile saat 9'da açık kalp penceresi (`kalp_penceresi=true`, Ø7,6 mm, r = 6,85 mm, 265°)
+
+Renkler: `gumus` (gümüş üstü siyah lazer levhası), `beyazsiyah` (beyaz üstü siyah lazer levhası), `gece` (siyah–altın,
+lazer ya da PCB), `beyaz` (beyaz maske + ENIG), `iznik` / `zumrut` (yalnız PCB).
 
 ```bash
 pip install shapely matplotlib pillow ezdxf
@@ -28,6 +33,7 @@ cd tasarim/kadran
 python3 kadran.py stil=klasik                                  # NH38A için (tarihsiz)
 python3 kadran.py stil=klasik tarih_penceresi=true             # NH35A için (saat 3'te tarih)
 python3 kadran.py stil=klasik tarih_penceresi=true ayak_delikleri=true   # PCB + pim ile hizalama
+python3 kadran.py stil=roma kalp_penceresi=true dxf_doku=true   # Roma + açık kalp, DXF'te DOKU (dalga) katmanı
 python3 kadran.py stil=rakamli logo=özgür                      # logo yazısını değiştirmek
 ```
 
@@ -39,8 +45,10 @@ En ince çizgi 0,15 mm (PCB ve asitle aşındırma sınırı).
 
 ## Hangi dosya nereye
 
-- **Lazer (önerilen):** `ozgur_kadran_<stil>_lazer.dxf` + Halsa'dan “Edico siyah–altın” 0,45 mm alüminyum levha.
-  Atölyeye: ALTIN katmanı = kaplamayı yak, KESIM katmanı = kes. Önce artık parçada deneme.
+- **Lazer (önerilen):** `ozgur_kadran_<stil>_lazer.dxf` + Halsa'dan “Edico” 0,45 mm alüminyum levha
+  (Gümüş–Siyah, Beyaz–Siyah veya Siyah–Altın). Atölyeye: ALTIN katmanı = kaplamayı aç (rakam ve işaretler),
+  KESIM katmanı = kes, DOKU katmanı (varsa) = tek geçişlik ince çizgi. Önce artık parçada deneme.
+  Roma için önerilen dosya: `ozgur_kadran_roma_kalpli_dokulu_lazer.dxf`.
 - **PCB:** `ozgur_kadran_<stil>_gerber.zip` → Robotistan PCB Servisi (gümrük dahil). 0,4 mm FR4, ENIG,
   siyah / mavi / yeşil maske, merkez delik NPTH. Sipariş numarası için arka yüzde `JLCJLCJLCJLC` alanı var.
 - **Özel kasa (Faz 2):** `tasarim/kasa/cikti/*.step` → yerli CNC atölyeleri (İkitelli / Ostim); önce `*.stl` ile reçine prova.

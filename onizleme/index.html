@@ -48,6 +48,7 @@ a { color: var(--lacivert); text-underline-offset: 2px; }
 a:focus-visible, button:focus-visible { outline: 2px solid var(--altin-parlak); outline-offset: 2px; }
 .etiket-ust { font: 500 .74rem/1.2 var(--f-veri); letter-spacing: .14em; text-transform: uppercase; color: var(--altin); }
 .veri { font-family: var(--f-veri); font-variant-numeric: tabular-nums; }
+p .veri, li .veri { overflow-wrap: anywhere; }
 .bolum { display: grid; gap: 20px; }
 .bolum-bas { display: grid; gap: 8px; }
 
@@ -92,6 +93,7 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--altin-parlak); 
 .uyari-kutu strong { color: var(--uyari); }
 
 /* --- tablolar --- */
+table.dar { min-width: 0; }
 .tablo-kap { overflow-x: auto; border: 1px solid var(--cizgi); border-radius: 6px; background: var(--yuzey); }
 table { border-collapse: collapse; width: 100%; min-width: 760px; font-size: .92rem; }
 th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--cizgi); vertical-align: top; }
@@ -147,8 +149,8 @@ ul.duz { margin: 0; padding-left: 18px; display: grid; gap: 8px; }
 
 <section class="sahne-kap" aria-label="3D saat önizlemesi">
   <div id="sahne">
-    <div class="yedek" id="yedek"><img src="varlik/kadran_beyaz_roma.webp" alt="Roma rakamlı kadran: beyaz zemin, altın Roma rakamları ve yaprak işaretler, merkezde guilloché, saat 9'da açık kalp penceresi, üstte OZGUR yazısı"></div>
-    <div class="rozet" id="kasa-rozet">Kasa: hazır klasik · bütçe içi</div>
+    <div class="yedek" id="yedek"><img src="varlik/kadran_gumus_roma.webp" alt="Roma rakamlı kadran: gümüş zemin, siyah Roma rakamları ve yaprak işaretler, ince dalgalı guilloché, saat 9'da açık kalp penceresi, üstte OZGUR yazısı"></div>
+    <div class="rozet" id="kasa-rozet">Kasa: hazır yuvarlak · satın alınır</div>
     <div class="durum" id="durum">3D model yükleniyor…</div>
   </div>
   <div class="panel">
@@ -164,8 +166,9 @@ ul.duz { margin: 0; padding-left: 18px; display: grid; gap: 8px; }
     <fieldset>
       <legend>Kadran rengi</legend>
       <div class="secenekler" data-grup="renk">
-        <button type="button" id="renk-beyaz" data-deger="beyaz" aria-pressed="true"><span class="nokta" style="background:#f1efe8"></span>Beyaz</button>
-        <button type="button" id="renk-gumus" data-deger="gumus" aria-pressed="false"><span class="nokta" style="background:#c9ccd0"></span>Gümüş</button>
+        <button type="button" id="renk-beyazsiyah" data-deger="beyazsiyah" aria-pressed="false"><span class="nokta" style="background:#f1f1ee"></span>Beyaz</button>
+        <button type="button" id="renk-beyaz" data-deger="beyaz" aria-pressed="false"><span class="nokta" style="background:#efe7d2"></span>Beyaz–altın</button>
+        <button type="button" id="renk-gumus" data-deger="gumus" aria-pressed="true"><span class="nokta" style="background:#c9ccd0"></span>Gümüş</button>
         <button type="button" id="renk-gece" data-deger="gece" aria-pressed="false"><span class="nokta" style="background:#0b0c0e"></span>Siyah</button>
         <button type="button" id="renk-iznik" data-deger="iznik" aria-pressed="false"><span class="nokta" style="background:#0d2c6e"></span>Mavi</button>
         <button type="button" id="renk-zumrut" data-deger="zumrut" aria-pressed="false"><span class="nokta" style="background:#0a3d2b"></span>Yeşil</button>
@@ -175,11 +178,11 @@ ul.duz { margin: 0; padding-left: 18px; display: grid; gap: 8px; }
     <fieldset>
       <legend>İbreler</legend>
       <div class="secenekler" data-grup="ibre">
-        <button type="button" id="ibre-altin" data-deger="altin" aria-pressed="true"><span class="nokta" style="background:#e3bb6d"></span>Altın</button>
+        <button type="button" id="ibre-altin" data-deger="altin" aria-pressed="false"><span class="nokta" style="background:#e3bb6d"></span>Altın</button>
         <button type="button" id="ibre-gumus" data-deger="gumus" aria-pressed="false"><span class="nokta" style="background:#d9dde2"></span>Gümüş</button>
-        <button type="button" id="ibre-mavi" data-deger="mavi" aria-pressed="false"><span class="nokta" style="background:#2b3f97"></span>Mavi çelik</button>
+        <button type="button" id="ibre-mavi" data-deger="mavi" aria-pressed="true"><span class="nokta" style="background:#2b3f97"></span>Mavi çelik</button>
       </div>
-      <p class="not">Türkiye'de kesin bulunan set gümüş; altın NH35 ibresi henüz bulunamadı.</p>
+      <p class="not">Türkiye'de bulunan NH35 seti gümüş. Yaprak ve mavi çelik ibre yurt içinde yok; bütçedeki ibre notuna bak.</p>
     </fieldset>
     <fieldset>
       <legend>Mekanizma</legend>
@@ -225,6 +228,31 @@ ul.duz { margin: 0; padding-left: 18px; display: grid; gap: 8px; }
   </div>
 </section>
 
+<section class="bolum" aria-labelledby="neden-b">
+  <div class="bolum-bas">
+    <div class="etiket-ust">Fotoğraftaki saat</div>
+    <h2 id="neden-b">O saat neden 50 dolar?</h2>
+  </div>
+  <div class="karar">
+    <div class="metin">
+      <p>Fotoğraftaki saat Patek Philippe değil. Guangzhou–Shenzhen'de on binlercesi üretilen jenerik bir “çok fonksiyonlu tourbillon” saatin üstüne sahte marka ve sahte “Swiss Made” basılmış. İçinde tourbillon yok: 6'daki pencere sadece balansı gösteren bir delik, Çinli toptancılar bunu kendileri “taklit tourbillon” diye satıyor.</p>
+      <p>İçindeki mekanizma 21 taşlı bir Çin otomatiği (Tianjin TY28xx ya da Mingzhu 2813/8205 türevi). Çin toptan sitelerinde bu mekanizmalar 7–19 $, saatin tamamı fabrika çıkışında 12–26 $ civarında görünüyor (sayfalar engelli olduğu için arama özetlerinden; kesin değil). Güzel görünümün sırrı tasarım değil, ölçek: aynı kalıp on binlerce kez basılınca kadran, kasa ve kaplama birkaç dolara iniyor.</p>
+      <p>Aynı görünümü kendi adınla, tek bir saat için yaptırınca bu ölçek yok. Karşılığında Seiko NH38A mekanizma, safir cam, 316L çelik ve sahte yazısı olmayan, senin adını taşıyan bir kadran alıyorsun. Sahte marka satmak Türkiye'de suç: Sınai Mülkiyet Kanunu m.30/1 satıcıya 1–3 yıl hapis öngörüyor.</p>
+    </div>
+    <div class="tablo-kap">
+      <table class="dar">
+        <thead><tr><th>Saat</th><th class="sayi">Fiyat</th></tr></thead>
+        <tbody>
+          <tr><td>Fotoğraftaki sahte “Patek”<span class="kaynak">Çin otomatiği, mineral cam, ince kaplama, sahte marka</span></td><td class="sayi">≈ 2.500–3.000 TL</td></tr>
+          <tr><td>Aynı görünüm, yasal: Winner / T-Winner<span class="kaynak">Saatline, 22 mekanik model, Türk satıcı</span></td><td class="sayi">2.229–2.999 TL</td></tr>
+          <tr><td><b>ozgur, Roma kadran</b><span class="kaynak">NH38A açık kalp, safir, 316L, senin adın</span></td><td class="sayi"><b>≈ 5.100–7.700 TL</b></td></tr>
+          <tr><td>Bu görünümün aslı: Tissot Le Locle Open Heart<span class="kaynak">gümüş kadran, Roma rakamı, açık kalp, kroko baskılı kayış</span></td><td class="sayi">46.230 TL</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
 <section class="bolum" aria-labelledby="karar-b">
   <div class="bolum-bas">
     <div class="etiket-ust">Kısa cevap</div>
@@ -232,57 +260,57 @@ ul.duz { margin: 0; padding-left: 18px; display: grid; gap: 8px; }
   </div>
   <div class="karar">
     <div class="metin">
-      <p><b>NH38A otomatik mekanizma</b> (Seiko NH35 ailesinin tarihsiz modeli), <b>hazır 36 mm safir camlı çelik kasa</b>, hazır ibreler ve deri kordon alıyoruz. Saati senin yapan parça <b>kadran</b>: yukarıdaki üç stilden birini seçiyorsun, üretim dosyasını ben hazırlıyorum.</p>
-      <p>Kadranın en ucuz yerli üretim yolu, üstü siyah kaplı altın renkli alüminyum levhaya <b>fiber lazerle</b> işletmek. Daha parlak, ışınsal dokulu ve mavi/yeşil seçenekli bir sonuç istersen aynı tasarım <b>baskı devre kartı (PCB)</b> olarak da yaptırılabilir. İki yolun dosyası da hazır.</p>
-      <p>Bütçe konusunda açık olayım: 5.000 TL ancak her kalem en ucuz uçtan gelirse tutuyor. Gerçekçi plan <b>~6.000 TL</b>. Özel 12 köşeli kasa ise ayrı bir ikinci aşama.</p>
+      <p>Fotoğraftaki havayı dürüst biçimde kuruyoruz: <b>gümüş kadran, siyah Roma rakamları, yaprak işaretler, ince dalga desenli zemin</b> ve saat 9'da içinden <b>gerçek balans çarkı</b> görünen açık kalp penceresi. Sahte alt kadran, sahte marka ya da “Swiss Made” yok; kadranda tek yazı senin adın.</p>
+      <p>Kadran Türkiye'de üretiliyor: Halsa'nın stokta olan <b>gümüş–siyah</b> (ya da beyaz–siyah) lazer levhasına fiber lazerle işleniyor. Mekanizma <b>NH38A</b> (açık kalpli, tarihsiz), kasa 39 mm cilalı çelik, kordon Sirkeci'den hakiki kroko.</p>
+      <p>Açık konuşayım: bu saat 5.000 TL'nin üstüne çıkıyor (≈ 6.100–7.700 TL), en ucuz kurguda ≈ 5.100 TL. Sadece o görünüm yetiyorsa yasal Winner/T-Winner 2.500 TL civarında; ozgur ise kendi adın ve daha iyi parçalar için.</p>
     </div>
     <div class="toplamlar">
       <div class="toplam onerilen">
-        <div class="ust"><span class="cip iyi">Önerilen</span><span class="tutar">5.540–7.140 TL</span></div>
-        <b>NH38A + tarihsiz kadran + saatçi montajı</b>
-        <p>İki yedek ibre seti ve günlük sapma ayarı dahil. Tarih penceresini hizalama derdi yok.</p>
+        <div class="ust"><span class="cip iyi">Önerilen</span><span class="tutar">6.090–7.690 TL</span></div>
+        <b>NH38A + 39 mm cilalı kasa + gümüş Roma kadran</b>
+        <p>Arkası camlı kasa, kroko kordon, saatçi montajı ve ayarı dahil.</p>
       </div>
       <div class="toplam">
-        <div class="ust"><span class="cip uyari">5.000 TL hedefi</span><span class="tutar">4.870–6.210 TL</span></div>
-        <b>NH35A + tarihli kadran, en ucuz kanallar</b>
-        <p>5.000'in altına ancak ibre ve kordon tek Temu sepetinden gelirse, lazer ve saatçi de en ucuz fiyattan çıkarsa iner.</p>
+        <div class="ust"><span class="cip uyari">En ucuz</span><span class="tutar">5.120–6.220 TL</span></div>
+        <b>NH35A + 36 mm kasa + tarihli Roma kadran</b>
+        <p>Açık kalp yok (NH35'te balans ön yüzden görünmez); saat 3'te tarih penceresi.</p>
       </div>
       <div class="toplam">
         <div class="ust"><span class="cip mavi">Faz 2</span><span class="tutar">≈ 5.000–25.000 TL</span></div>
-        <b>Özel 12 köşeli kasa (316L çelik, CNC)</b>
-        <p>Yerli CNC atölye ücretlerinden tahmin. Gerçek fiyat, STEP dosyalarıyla teklif alınınca belli olur.</p>
+        <b>Özel 12 köşeli kasa (316L, CNC)</b>
+        <p>Yerli CNC atölye ücretlerinden tahmin; gerçek fiyat STEP dosyasıyla teklif alınınca belli olur.</p>
       </div>
     </div>
   </div>
   <div class="uyari-kutu">
-    <strong>2026 gümrük kuralı planı belirliyor</strong>
-    <p>7 Ocak 2026 tarihli Cumhurbaşkanı Kararı (Resmî Gazete 33130) ile yurt dışı kargolarda 30 € muafiyeti kalktı; Şubat 2026'dan beri her paket tam beyanla gümrükleniyor. PTT hattında paket başına <span class="veri">3.984 TL</span> müşavirlik ve <span class="veri">1.650 TL</span> damga vergisi, yani ≈ <span class="veri">5.634 TL</span> sabit masraf var. AliExpress ya da JLCPCB'den 20 dolarlık bir sipariş bile bütçeyi tek başına aşıyor. Bu yüzden her şey Türkiye içinden ya da vergiyi sepette tahsil eden Türk ithalatçılardan (Temu Türkiye, Robotistan, Hepsiburada “Yurt Dışından”) alınacak.</p>
+    <strong>Yurt dışından sipariş neden yok</strong>
+    <p>7 Ocak 2026 tarihli Cumhurbaşkanı Kararı (Resmî Gazete 33130) ile 30 € muafiyeti kalktı; Şubat 2026'dan beri her paket tam beyanla gümrükleniyor. PTT hattında paket başına <span class="veri">3.984 TL</span> müşavirlik ve <span class="veri">1.650 TL</span> damga vergisi, yani ≈ <span class="veri">5.634 TL</span> sabit masraf var. Bu yüzden parçalar Türkiye içinden ya da vergiyi sepette alan Türk satıcılardan alınıyor.</p>
   </div>
 </section>
 
 <section class="bolum" aria-labelledby="butce-b">
   <div class="bolum-bas">
     <div class="etiket-ust">Malzeme listesi</div>
-    <h2 id="butce-b">Bütçe</h2>
-    <p>Fiyatlar araştırmada bulunan ilanlardan (Ekim 2026). <span class="tahmin">TAHMİN</span> yazanlar ilan fiyatı değil, benzer işlerden çıkarılmış aralık. Hepsiburada fiyatları tarihsiz anlık görüntü; almadan önce sepette son fiyata bak.</p>
+    <h2 id="butce-b">Bütçe: Roma kadranlı ozgur</h2>
+    <p>Fiyatlar araştırmada bulunan ilanlardan (7–8 Ekim 2026). <span class="tahmin">TAHMİN</span> yazanlar ilan fiyatı değil, benzer işlerden çıkarılmış aralık. <span class="tahmin">DOĞRULANAMADI</span> yazan Hepsiburada fiyatları tarihsiz arama özetlerinden; site otomatik okumayı engelliyor, almadan önce sepette bak.</p>
   </div>
   <div class="tablo-kap">
     <table>
       <thead><tr><th>Kalem</th><th>Seçim ve kanal</th><th class="sayi">Önerilen</th><th class="sayi">En ucuz</th></tr></thead>
       <tbody>
-        <tr><td>Mekanizma</td><td>Önerilen: NH38A + kurma mili, Gui Xulian · En ucuz: NH35A, Talent<span class="kaynak">İkisi de Hepsiburada “Yurt Dışından”</span></td><td class="sayi">1.857</td><td class="sayi">1.581</td></tr>
-        <tr><td>Kasa</td><td>Geervo 36 mm, safir cam, 316L çelik<span class="kaynak">Hepsiburada “Yurt Dışından”; ara halka ve kurma kolu dahil mi sor</span></td><td class="sayi">1.345</td><td class="sayi">1.345</td></tr>
-        <tr><td>Kadran levhası</td><td>Edico siyah–altın lazer alüminyumu, 30×60 cm<span class="kaynak">Halsa, Başakşehir · onlarca deneme yeter</span></td><td class="sayi">310</td><td class="sayi">310</td></tr>
-        <tr><td>Kadran lazer işçiliği</td><td>Ostim Etiket ya da yerel fiber lazer atölyesi<span class="kaynak">Adet şartı yok, 2–7 iş günü</span></td><td class="sayi">500–1.000 <span class="tahmin">TAHMİN</span></td><td class="sayi">500–1.000 <span class="tahmin">TAHMİN</span></td></tr>
-        <tr><td>İbreler</td><td>Önerilen: Humble 3 takım, gümüş (2 yedek), Hepsiburada · En ucuz: Temu sepeti, ibre + kordon<span class="kaynak">Temu'da asgari sepet 580 TL</span></td><td class="sayi">581</td><td class="sayi">580–826</td></tr>
-        <tr><td>Kordon</td><td>20 mm hakiki deri, Amazon.com.tr<span class="kaynak">En ucuz yolda ibreyle aynı sepette</span></td><td class="sayi">398</td><td class="sayi">—</td></tr>
+        <tr><td>Mekanizma</td><td>Önerilen: NH38A açık kalp + kurma mili · En ucuz: NH35A tarihli<span class="kaynak">Hepsiburada “Yurt Dışından” <span class="tahmin">DOĞRULANAMADI</span></span></td><td class="sayi">1.857</td><td class="sayi">1.581</td></tr>
+        <tr><td>Kasa</td><td>Önerilen: Humble 39 mm cilalı, safir, arkası camlı · En ucuz: Geervo 36 mm safir<span class="kaynak">Hepsiburada “Yurt Dışından” <span class="tahmin">DOĞRULANAMADI</span>; ara halka ve kurma kolu dahil mi sor</span></td><td class="sayi">2.041</td><td class="sayi">1.345</td></tr>
+        <tr><td>Kadran levhası</td><td>Halsa Edico Gümüş–Siyah (ya da Beyaz–Siyah), 0,45 mm, 30×60 cm<span class="kaynak">8 Ekim'de stokta; bir levhadan ~200 kadran çıkar</span></td><td class="sayi">310</td><td class="sayi">310</td></tr>
+        <tr><td>Kadran lazer işçiliği</td><td>Ostim Etiket ya da yerel fiber lazer atölyesi (tek parça kabul ediyor)</td><td class="sayi">500–1.000 <span class="tahmin">TAHMİN</span></td><td class="sayi">500–1.000 <span class="tahmin">TAHMİN</span></td></tr>
+        <tr><td>İbreler</td><td>Humble 3 takım, gümüş (yurt içinde bulunan tek NH35 seti)<span class="kaynak">Yaprak / Breguet / mavi çelik yurt içinde yok: aşağıdaki nota bak</span></td><td class="sayi">581</td><td class="sayi">581</td></tr>
+        <tr><td>Kordon</td><td>Hakiki kroko, mat, 20 mm, kahve<span class="kaynak">SaatBook, Sirkeci · stokta</span></td><td class="sayi">253</td><td class="sayi">253</td></tr>
         <tr><td>Kadran sabitleme</td><td>Dial dot ya da ince çift taraflı kadran bandı</td><td class="sayi">50–150 <span class="tahmin">TAHMİN</span></td><td class="sayi">50–150 <span class="tahmin">TAHMİN</span></td></tr>
         <tr><td>Montaj</td><td>Saatçi: kadran, ibreler, kurma mili kesimi, kapanış (önerilende ayar dahil)</td><td class="sayi">500–1.500 <span class="tahmin">TAHMİN</span></td><td class="sayi">500–1.000 <span class="tahmin">TAHMİN</span></td></tr>
-        <tr class="toplam-satir"><td>Toplam</td><td></td><td class="sayi">5.541–7.141</td><td class="sayi">4.867–6.212</td></tr>
+        <tr class="toplam-satir"><td>Toplam</td><td></td><td class="sayi">6.092–7.692</td><td class="sayi">5.120–6.220</td></tr>
       </tbody>
     </table>
   </div>
-  <p>Kur ve ilan fiyatları oynuyor; üstüne %10 pay koy. Tek saat için saatçi, alet seti almaktan ucuz (Türkiye'de ayrı ayrı alınan aletler 2.000–3.500 TL tutuyor).</p>
+  <p><b>İbre notu.</b> Bu kadrana en çok mavi çelik yaprak ya da Breguet ibre yakışır ama Türkiye'de NH35 için satan bulunamadı. Yurt dışında 3,4–26 $ (AliExpress, Namoki, Watch-Modz); kargoyla gelirse ≈5.634 TL gümrük masrafı biner. Seçenekler: yurt dışından gelen bir tanıdığın valizinde getirmesi, Sirkeci'deki SaatBook'a NH35 delik ölçülü (1,50 / 0,88 / 0,20 mm) dress ibre sormak ya da gümüş setle başlamak. Ölçü hedefi: akrep ≈ 9 mm, yelkovan ≈ 13 mm, saniye ≈ 13 mm.</p>
 </section>
 
 <section class="bolum" aria-labelledby="yol-b">
@@ -291,15 +319,15 @@ ul.duz { margin: 0; padding-left: 18px; display: grid; gap: 8px; }
     <h2 id="yol-b">Adım adım</h2>
   </div>
   <ol class="adimlar">
-    <li><b>Stili ve rengi seç.</b><p>Yukarıdaki sahnede dene. Logo yazısı (OZGUR, ozgur, özgür…) ve ölçüler kodda tek satır; yeni dosyaları ben üretirim.</p></li>
-    <li><b>Kanalları doğrula.</b><p>Hepsiburada “Yurt Dışından” sepetinde gümrük satırı görünüyor mu, gümrüğü Hepsiburada mı çekiyor? Yazılı teyit yoksa o kanaldan alma. Temu'da ürünün Türkiye adresiyle “satın alınabilir” olduğunu gör.</p></li>
-    <li><b>Önce kasayı al ve ölç.</b><p>İlanda 28,5 mm kadran yazmalı. Ara halka ve kurma kolu kutuda mı sor. Gelince camın altından görünen kadran çapını ölç (en az 27,1 mm olmalı); farklıysa kadranı o ölçüye göre yeniden üretirim.</p></li>
-    <li><b>Mekanizmayı al.</b><p>NH38A (tarihsiz) önerilir. Satıcıdan rotor ve köprü üzerindeki “TMI/JAPAN” yazısının fotoğrafını iste; bu fiyatta orijinal garanti edilemez.</p></li>
-    <li><b>Kadranı lazere ver.</b><p>Halsa'dan levhayı al, atölyeye DXF dosyasıyla gönder: ALTIN katmanı “kaplamayı yak”, KESIM katmanı “kes”. Önce artık bir parçada deneme izi, sonra 2–3 kopya iste.</p></li>
-    <li><b>İbre, kordon ve kadran bandını al.</b><p>Altın ibre bulursan siyah–altın kadrana en iyi o yakışır; yoksa gümüş set.</p></li>
-    <li><b>Saatçiye taktır.</b><p>2–3 saatçiden yazılı teklif al. Kadran ayaksız olduğu için bantla/dial dot ile yapıştırılacak, ibreler saat 12'de üst üste hizalanacak, kurma mili kasaya göre kesilecek.</p></li>
-    <li><b>Bir hafta tak, ayarı kontrol et.</b><p>Fabrika toleransı günde −20/+40 saniye. Çok saparsa saatçi birkaç dakikada ayarlar.</p></li>
-    <li><b>İsteğe bağlı: özel kasa (Faz 2).</b><p>Önce STEP/STL dosyasından ucuz bir reçine prova baskısı al, bileğinde dene. Beğenirsen dosyaları 3 yerli CNC atölyesine gönder. Mekanizma, kadran, ibre ve kordon olduğu gibi yeni kasaya taşınır.</p></li>
+    <li><b>Stili ve rengi seç.</b><p>Sahnede dene. Logo yazısı (OZGUR, ozgur, özgür) ve ölçüler kodda tek satır; yeni dosyaları ben üretirim.</p></li>
+    <li><b>Kanalları doğrula.</b><p>Hepsiburada “Yurt Dışından” sepetinde gümrük satırı görünüyor mu, gümrüğü Hepsiburada mı çekiyor? Yazılı teyit yoksa o kanaldan alma.</p></li>
+    <li><b>Önce kasayı al ve ölç.</b><p>İlanda 28,5 mm kadran yazmalı. Ara halka ve kurma kolu kutuda mı sor. Gelince camın altından görünen kadran çapını ölç (en az 27,1 mm); farklıysa kadranı o ölçüye göre yeniden üretirim.</p></li>
+    <li><b>NH38A'yı al.</b><p>Açık kalp penceresi bu mekanizmaya göre çizildi (Seiko föyü: Ø10 mm'ye kadar, merkez r = 6,85 mm, 265°). Satıcıdan rotordaki “TMI/JAPAN” yazısının fotoğrafını iste.</p></li>
+    <li><b>Levhayı al, önce deneme kes.</b><p>Halsa'ya “Gümüş–Siyah”ta yüzey renginin gümüş olduğunu (lazerin siyah açtığını) teyit ettir. Atölyeye <span class="veri">ozgur_kadran_roma_kalpli_dokulu_lazer.dxf</span> gönder: KESIM = kes, ALTIN = rakam ve işaretleri aç, DOKU = tek geçişte ince çizgi. MOPA lazer varsa doku gri tonla da yapılabilir. Önce artık parçada deneme, sonra 2–3 kopya.</p></li>
+    <li><b>İbre ve kordonu al.</b><p>Kroko kordon SaatBook'ta. İbre için yukarıdaki nota bak.</p></li>
+    <li><b>Saatçiye taktır.</b><p>2–3 saatçiden yazılı teklif al. Kadran ayaksız; dial dot ya da bantla yapışacak, ibreler saat 12'de üst üste hizalanacak, kurma mili kasaya göre kesilecek.</p></li>
+    <li><b>Bir hafta tak, ayarı kontrol et.</b><p>Fabrika toleransı günde −20/+40 saniye; çok saparsa saatçi birkaç dakikada ayarlar.</p></li>
+    <li><b>İsteğe bağlı: özel kasa (Faz 2).</b><p>12 köşeli kasa için önce reçine prova baskısı, sonra yerli CNC atölyelerinden teklif. Mekanizma, kadran, ibre ve kordon yeni kasaya olduğu gibi taşınır.</p></li>
   </ol>
 </section>
 
@@ -310,7 +338,7 @@ ul.duz { margin: 0; padding-left: 18px; display: grid; gap: 8px; }
     <p>Hepsinde yazı olarak yalnız logo var. Ölçüler Seiko'nun resmî NH35/NH38 föyünden: Ø28,50 mm, merkez deliği Ø2,10 mm, en ince çizgi 0,15 mm.</p>
   </div>
   <div class="stiller dort">
-    <figure><img src="varlik/kadran_beyaz_roma.webp" alt="Roma kadran: beyaz zemin, altın Roma rakamları, yaprak işaretler, merkezde guilloché, saat 9'da açık kalp penceresi" loading="lazy"><figcaption><b>Roma</b>XII, III, VI rakamları, guilloché merkez, gerçek balansı gösteren açık kalp. Yaprak ibrelerle.</figcaption></figure>
+    <figure><img src="varlik/kadran_gumus_roma.webp" alt="Roma kadran: gümüş zemin, siyah Roma rakamları, yaprak işaretler, ince guilloché, saat 9 yönünde açık kalp penceresi" loading="lazy"><figcaption><b>Roma</b>XII, III, VI rakamları, guilloché merkez, gerçek balansı gösteren açık kalp. Yaprak ibrelerle.</figcaption></figure>
     <figure><img src="varlik/kadran_gece_klasik.webp" alt="Klasik kadran: ince altın çubuklar, 12'de çift çubuk, OZGUR yazısı" loading="lazy"><figcaption><b>Klasik</b>İnce çubuk işaretler, 12'de çift çubuk. Dauphine ibrelerle.</figcaption></figure>
     <figure><img src="varlik/kadran_gece_rakamli.webp" alt="Rakamlı kadran: 12, 3, 6, 9 rakamları ve çubuklar, küçük harfle ozgur" loading="lazy"><figcaption><b>Rakamlı</b>12, 3, 6, 9 rakamlı, küçük harfli logo. Kılıç ibrelerle.</figcaption></figure>
     <figure><img src="varlik/kadran_gece_sektor.webp" alt="Sektör kadran: eş merkezli halkalar, 1'den 12'ye rakamlar, artı çizgisi" loading="lazy"><figcaption><b>Sektör</b>Halkalı, 1–12 rakamlı, eski usul. İnce çubuk ibrelerle.</figcaption></figure>
@@ -319,19 +347,19 @@ ul.duz { margin: 0; padding-left: 18px; display: grid; gap: 8px; }
     <div class="yontem">
       <div class="ust"><h3>Lazer (önerilen)</h3><span class="veri">810–1.310 TL</span></div>
       <ul>
-        <li>Üst katmanı siyah, altı altın renk 0,45 mm alüminyum levha; lazer siyahı yakınca altın çıkar</li>
-        <li>Yerli, tek adet, 1–2 hafta</li>
-        <li>Yalnız siyah–altın, doku yok</li>
-        <li>Kesim kenarı gümüş görünür; kasanın iç bileziği örter</li>
+        <li>Halsa Edico 0,45 mm alüminyum levha: Gümüş–Siyah ve Beyaz–Siyah stokta, Siyah–Altın da var</li>
+        <li>Lazer üst katmanı açınca alttaki renk çıkar: gümüş zemine siyah rakam</li>
+        <li>Dalga deseni tek geçişlik ince çizgi (guilloché görünümü, el işi değil); MOPA lazerle gri ton da mümkün (deneme şart)</li>
+        <li>Yerli, tek adet, 1–2 hafta; kesim kenarı kasanın iç bileziği altında kalır</li>
       </ul>
     </div>
     <div class="yontem">
       <div class="ust"><h3>PCB kadran</h3><span class="veri">≈ 800–1.300 TL <span class="tahmin">TAHMİN</span></span></div>
       <ul>
-        <li>0,4 mm FR4, ENIG altın kaplama, siyah / mavi / yeşil maske; 5 adet gelir</li>
-        <li>Maske altındaki ince çizgiler hafif ışınsal (sunburst) doku verir</li>
-        <li>Robotistan PCB Servisi: gümrük, KDV ve kargo dahil fiyat; 2–4 hafta</li>
-        <li>Kenar toleransı ±0,2 mm; gerekirse ince zımparayla alınır</li>
+        <li>0,4 mm FR4, ENIG altın; siyah, mavi, yeşil ya da beyaz maske; 5 adet gelir</li>
+        <li>Siyah, mavi ve yeşilde altın parlak durur; beyaz maskede soluk kalır</li>
+        <li>Beyaz maske altındaki bakır doku neredeyse görünmez</li>
+        <li>Robotistan PCB Servisi: gümrük, KDV ve kargo dahil; 2–4 hafta</li>
       </ul>
     </div>
   </div>
@@ -436,6 +464,13 @@ ul.duz { margin: 0; padding-left: 18px; display: grid; gap: 8px; }
     <li><a href="https://armut.com/fiyatlari/lazer-markalama_52497" target="_blank" rel="noopener">Armut</a>: lazer markalama ve saat tamiri fiyat aralıkları</li>
     <li><a href="https://www.turkmaksan.com.tr/cnc-isleme-fiyatlari/" target="_blank" rel="noopener">Turkmaksan</a>: 2026 CNC saat ücretleri</li>
     <li><a href="https://cdn2.islamansiklopedisi.org.tr/dosya/9/C09003562.pdf" target="_blank" rel="noopener">TDV İslâm Ansiklopedisi</a>: Döner Kümbet</li>
+    <li><a href="https://www.saatline.com.tr/t-winner-1" target="_blank" rel="noopener">Saatline</a>: T-Winner / Winner mekanik saatler</li>
+    <li><a href="https://www.tissotwatches.com/tr-tr/t0064071603301.html" target="_blank" rel="noopener">Tissot Türkiye</a>: Le Locle Open Heart</li>
+    <li><a href="https://reference.grail-watch.com/family/tianjin-ty2800" target="_blank" rel="noopener">Grail Watch Reference</a>: Tianjin TY2800 mekanizma ailesi</li>
+    <li><a href="https://barandogan.av.tr/blog/ceza-hukuku/marka-hakkina-tecavuz-sucu-marka-suclari-cezasi.html" target="_blank" rel="noopener">SMK m.30</a>: marka hakkına tecavüz suçu</li>
+    <li><a href="https://saatbook.com/saat-parcalari-saatci-aletleri-malzemeleri/hakiki-deri-kayis/hakiki-kroko-mat-deri-yarim-bombeli-sa" target="_blank" rel="noopener">SaatBook</a>: hakiki kroko kordon</li>
+    <li><a href="https://www.troteclaser.com/en-us/helpcenter/materials/material-usage-hints/black-marking-anodized-aluminum" target="_blank" rel="noopener">Trotec</a>: eloksalda MOPA ile siyah/gri markalama</li>
+    <li><a href="https://andybrown.me.uk/?p=4010" target="_blank" rel="noopener">Andy Brown</a>: beyaz maske altında bakırın görünürlüğü</li>
   </ul>
 </section>
 
@@ -459,12 +494,12 @@ const durumEl = document.getElementById('durum');
 const azHareket = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 // ---------- durum ----------
-const S = { stil: 'roma', renk: 'beyaz', ibre: 'mavi', tarih: 'yok', kasa: 'klasik', metal: 'celik', kordon: 'kroko', gorunum: 'on' };
+const S = { stil: 'roma', renk: 'gumus', ibre: 'mavi', tarih: 'yok', kasa: 'klasik', metal: 'celik', kordon: 'kroko', gorunum: 'on' };
 try {
   const kayit = JSON.parse(localStorage.getItem('ozgur-secim') || '{}');
-  if (kayit.surum === 2) for (const k of ['stil', 'renk', 'ibre', 'tarih', 'kasa', 'metal', 'kordon']) if (kayit[k]) S[k] = kayit[k];
+  if (kayit.surum === 3) for (const k of ['stil', 'renk', 'ibre', 'tarih', 'kasa', 'metal', 'kordon']) if (kayit[k]) S[k] = kayit[k];
 } catch (e) {}
-const kaydet = () => { try { const { gorunum, ...geri } = S; localStorage.setItem('ozgur-secim', JSON.stringify({ ...geri, surum: 2 })); } catch (e) {} };
+const kaydet = () => { try { const { gorunum, ...geri } = S; localStorage.setItem('ozgur-secim', JSON.stringify({ ...geri, surum: 3 })); } catch (e) {} };
 
 // ---------- render ----------
 let renderer;
@@ -529,7 +564,7 @@ const M = {
   cam: new THREE.MeshPhysicalMaterial({ color: 0xf2f6ff, metalness: 0, roughness: 0, transparent: true, opacity: 0.14, depthWrite: false, specularIntensity: 0.6, envMapIntensity: 0.8 }),
   kenar: new THREE.MeshStandardMaterial({ color: 0x15161a, roughness: 0.6 }),
 };
-const IBRE_RENK = { altin: 0xe9c47e, gumus: 0xe2e5e9, mavi: 0x1b2a78 };
+const IBRE_RENK = { altin: 0xe9c47e, gumus: 0xe2e5e9, mavi: 0x14204f };
 const METAL_RENK = { celik: 0xd9dce0, rose: 0xe8b49c, altin: 0xe8c784 };
 
 // ---------- yardımcılar ----------
@@ -565,10 +600,12 @@ P.kadran.add(kadranKenar);
 // zM/zP: zeminin metalikliği/pürüzlülüğü; iM/iP: işaretlerin
 const ALTIN = [232, 192, 112];
 const RENK = {
-  beyaz:  { zemin: [243, 241, 234], kabartma: [226, 212, 182], altin: [214, 168, 88], zM: 0.0, zP: 0.62, iM: 1, iP: 0.2,
-            not: 'Beyaz–altın: PCB kadran (beyaz maske + ENIG altın). Altın çizgilerin altındaki bakır, beyaz maskede krem bir guilloché dokusu verir.' },
-  gumus:  { zemin: [206, 208, 212], kabartma: [178, 181, 186], altin: [22, 24, 30], zM: 0.9, zP: 0.34, iM: 0, iP: 0.7,
-            not: 'Gümüş–siyah: gümüş üstü siyah lazer levhası (stok durumu araştırılıyor). Guilloché isteğe bağlı ince koyu çizgi olarak işlenir.' },
+  beyaz:  { zemin: [243, 241, 234], kabartma: [239, 235, 225], altin: [217, 194, 133], zM: 0.0, zP: 0.62, iM: 1, iP: 0.2,
+            not: 'Beyaz–altın: PCB kadran (beyaz maske + ENIG). Soluk altın beyazda az belirgin; beyaz maske altındaki bakır doku da neredeyse görünmez.' },
+  beyazsiyah: { zemin: [240, 240, 236], kabartma: [205, 205, 203], altin: [16, 18, 22], zM: 0.0, zP: 0.5, iM: 0, iP: 0.7,
+            not: 'Beyaz–siyah: beyaz üstü siyah lazer levhası (Halsa Edico Beyaz-Siyah, stokta). Guilloché tek geçişlik ince lazer çizgisi; önce deneme parçası.' },
+  gumus:  { zemin: [206, 208, 212], kabartma: [186, 189, 194], altin: [22, 24, 30], zM: 0.9, zP: 0.34, iM: 0, iP: 0.7,
+            not: 'Gümüş–siyah: gümüş üstü siyah lazer levhası. Dalga deseni tek geçişlik ince lazer çizgisiyle (DOKU katmanı) işlenir; gerçek el guilloché'si değil, onun görünümü. Önce deneme parçası.' },
   gece:   { zemin: [9, 10, 12],   kabartma: [22, 24, 28],  altin: ALTIN, zM: 0.0, zP: 0.72, iM: 1, iP: 0.16,
             not: 'Siyah–altın: lazerle (Halsa Edico levhası) ya da PCB ile yapılır. Doku yalnız PCB\'de çıkar.' },
   iznik:  { zemin: [11, 40, 104], kabartma: [22, 58, 128], altin: ALTIN, zM: 0.0, zP: 0.72, iM: 1, iP: 0.16, not: 'Mavi–altın: yalnız PCB kadranla.' },
@@ -702,7 +739,7 @@ mek.add(silindir(13.7, 3.5, 128, M.rodaj, -1.6 - 1.75));               // alt g�
   const d = new THREE.Path(); d.absarc(balansKonum.x, balansKonum.y, 4.1, 0, Math.PI * 2, true); s.holes.push(d);
   const m = new THREE.Mesh(new THREE.ExtrudeGeometry(s, { depth: 1.2, bevelEnabled: false, curveSegments: 72 }), M.rodaj);
   m.position.z = -1.6; mek.add(m);
-  const taban = new THREE.Mesh(new THREE.CircleGeometry(4.1, 48), new THREE.MeshStandardMaterial({ color: 0x8d9198, metalness: 1, roughness: 0.5 }));
+  const taban = new THREE.Mesh(new THREE.CircleGeometry(4.1, 48), new THREE.MeshStandardMaterial({ color: 0x55595f, metalness: 1, roughness: 0.55 }));
   taban.position.set(balansKonum.x, balansKonum.y, -1.59); mek.add(taban);
   // balans köprüsü (tek kollu), kalbin üstünden merkeze uzanır
   const kopru = new THREE.Mesh(new THREE.BoxGeometry(5.2, 1.1, 0.35), M.rodaj);
@@ -902,7 +939,7 @@ function uygula() {
   M.celik.color.setHex(METAL_RENK[S.metal]);
   M.celikMat.color.setHex(METAL_RENK[S.metal]).multiplyScalar(0.94);
   M.ibre.color.setHex(IBRE_RENK[S.ibre]);
-  document.getElementById('kasa-rozet').textContent = kumbet ? 'Kasa: 12 köşe · özel tasarım (Faz 2)' : 'Kasa: hazır klasik · bütçe içi';
+  document.getElementById('kasa-rozet').textContent = kumbet ? 'Kasa: 12 köşe · özel tasarım (Faz 2)' : 'Kasa: hazır yuvarlak · satın alınır';
   const patlat = S.gorunum === 'parca';
   for (const [ad, o] of Object.entries(etiketler)) o.visible = patlat && P[ad].visible;
   ibreleriKur();

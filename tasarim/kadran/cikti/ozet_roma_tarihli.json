@@ -3,13 +3,13 @@
   "cap_mm": 28.5,
   "yazi_sinirlari": [
     [
-      -3.36,
-      4.8,
-      3.36,
-      5.9
+      -4.54,
+      4.57,
+      4.54,
+      6.13
     ]
   ],
-  "altin_alan_mm2": 43.83,
-  "golge_alan_mm2": 84.77,
+  "altin_alan_mm2": 54.89,
+  "golge_alan_mm2": 186.55,
   "tarih_penceresi": true
 }
